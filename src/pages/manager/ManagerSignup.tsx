@@ -10,6 +10,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { AlertCircle, Mail, Lock, User, Phone } from "lucide-react"
 import OTPModal from '../../components/OTPModal';
+import { GoogleLogin } from '@react-oauth/google';
 
 interface SignupFormInputs {
   name: string
@@ -38,6 +39,7 @@ const ManagerSignup: React.FC = () => {
   const [tempEmail, setTempEmail] = useState('');
   const navigate = useNavigate()
   const [error, setError] = useState<string>("")
+    const [loading, setLoading] = useState(false);
   const [otpError, setOtpError] = useState<string>("");
   const {
     register,
@@ -67,6 +69,40 @@ const ManagerSignup: React.FC = () => {
       setError(error.response?.data?.message || 'An error occurred during signup');
     }
   };
+
+  const handleGoogleLoginSuccess = async (credentialResponse: any) => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      console.log('Google login response:', credentialResponse);
+      
+      // Send the credential token to your backend with the role
+      const response = await axios.post('http://localhost:5000/api/auth/google/token', {
+        credential: credentialResponse.credential,
+        role: 'manager' // Hardcode the role to match the component purpose
+      });
+  
+      console.log('Google authentication successful:', response.data);
+      
+      // Save token and user data
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+      // Redirect to appropriate dashboard
+      navigate('/manager/dashboard');
+    } catch (err: any) {
+      console.error('Google login error:', err);
+      setError(err.response?.data?.message || 'Google authentication failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLoginError = () => {
+    setError('Google login failed. Please try again.');
+  };
+  
 
   const handleOTPVerification = async (otp: string) => {
     try {
@@ -224,6 +260,16 @@ const ManagerSignup: React.FC = () => {
               {isSubmitting ? "Creating account... ⏳" : "Sign up 🎉"}
             </Button>
           </div>
+           <div className="text-center">
+                    <GoogleLogin
+                            onSuccess={handleGoogleLoginSuccess}
+                            onError={handleGoogleLoginError}
+                            useOneTap
+                            logo_alignment="center"
+                            text="continue_with"
+                            shape="rectangular"
+                          />
+                  </div>
         </form>
       </div>
       <OTPModal

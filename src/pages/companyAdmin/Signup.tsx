@@ -1,15 +1,16 @@
-import type React from "react"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
+import type React from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { AlertCircle, Mail, Lock, User, Phone } from "lucide-react"
+import { AlertCircle, Mail, Lock, User, Phone } from "lucide-react";
 import OTPModal from '../../components/OTPModal';
+import { GoogleLogin } from '@react-oauth/google';
 
 interface SignupFormInputs {
   name: string
@@ -38,6 +39,7 @@ const CompanyAdminSignup: React.FC = () => {
   const [tempEmail, setTempEmail] = useState('');
   const navigate = useNavigate()
   const [error, setError] = useState<string>("")
+  const [loading, setLoading] = useState(false);
   const [otpError, setOtpError] = useState<string>("");
   const {
     register,
@@ -47,6 +49,7 @@ const CompanyAdminSignup: React.FC = () => {
     resolver: yupResolver(signupSchema),
   })
 
+  
   const onSubmit = async (data: SignupFormInputs) => {
     try {
       setError('');
@@ -69,6 +72,40 @@ const CompanyAdminSignup: React.FC = () => {
     }
     
   };
+
+  const handleGoogleLoginSuccess = async (credentialResponse: any) => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      console.log('Google login response:', credentialResponse);
+      
+      // Send the credential token to your backend with the role
+      const response = await axios.post('http://localhost:5000/api/auth/google/token', {
+        credential: credentialResponse.credential,
+        role: 'companyAdmin' // Hardcode the role to match the component purpose
+      });
+  
+      console.log('Google authentication successful:', response.data);
+      
+      // Save token and user data
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+      
+      // Redirect to appropriate dashboard
+      navigate('/companyadmin/dashboard');
+    } catch (err: any) {
+      console.error('Google login error:', err);
+      setError(err.response?.data?.message || 'Google authentication failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleLoginError = () => {
+    setError('Google login failed. Please try again.');
+  };
+  
 
   const handleOTPVerification = async (otp: string) => {
     try {
@@ -226,6 +263,16 @@ const CompanyAdminSignup: React.FC = () => {
               {isSubmitting ? "Creating account... ⏳" : "Sign up 🎉"}
             </Button>
           </div>
+          <div className="text-center">
+          <GoogleLogin
+                  onSuccess={handleGoogleLoginSuccess}
+                  onError={handleGoogleLoginError}
+                  useOneTap
+                  logo_alignment="center"
+                  text="continue_with"
+                  shape="rectangular"
+                />
+        </div>
         </form>
       </div>
       <OTPModal
