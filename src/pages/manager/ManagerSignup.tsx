@@ -1,23 +1,43 @@
-import type React from "react"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
+"use client";
+
+import type React from "react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { AlertCircle, Mail, Lock, User, Phone } from "lucide-react"
-import OTPModal from '../../components/OTPModal';
-import { GoogleLogin } from '@react-oauth/google';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "../../components/ui/card";
+import {
+  AlertCircle,
+  Mail,
+  Lock,
+  User,
+  Phone,
+  Eye,
+  EyeOff,
+} from "lucide-react";
+import { Alert, AlertDescription } from "../../components/ui/alert";
+import { Separator } from "../../components/ui/separator";
+import OTPModal from "../../components/OTPModal";
+import { GoogleLogin } from "@react-oauth/google";
 
 interface SignupFormInputs {
-  name: string
-  email: string
-  phoneNumber: string
-  password: string
-  confirmPassword: string
+  name: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  confirmPassword: string;
 }
 
 const signupSchema = yup.object({
@@ -27,104 +47,126 @@ const signupSchema = yup.object({
     .string()
     .matches(/^\d{10}$/, "Phone number must be 10 digits")
     .required("Phone number is required"),
-  password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password")], "Passwords must match")
     .required("Confirm password is required"),
-})
+});
 
 const ManagerSignup: React.FC = () => {
   const [isOTPModalOpen, setIsOTPModalOpen] = useState(false);
-  const [tempEmail, setTempEmail] = useState('');
-  const navigate = useNavigate()
-  const [error, setError] = useState<string>("")
-    const [loading, setLoading] = useState(false);
+  const [tempEmail, setTempEmail] = useState("");
+  const navigate = useNavigate();
+  const [error, setError] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [otpError, setOtpError] = useState<string>("");
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<SignupFormInputs>({
     resolver: yupResolver(signupSchema),
-  })
+  });
 
   const onSubmit = async (data: SignupFormInputs) => {
     try {
-      setError('');
-      
-      const response = await axios.post('http://localhost:5000/api/auth/signup/initiate', {
-        name: data.name,
-        email: data.email,
-        phoneNumber: data.phoneNumber,
-        password: data.password,
-        role: 'manager' // Set role as manager
-      });
+      setError("");
+
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/signup/initiate",
+        {
+          name: data.name,
+          email: data.email,
+          phoneNumber: data.phoneNumber,
+          password: data.password,
+          role: "manager", // Set role as manager
+        }
+      );
 
       if (response.data.success) {
         setTempEmail(data.email);
         setIsOTPModalOpen(true);
       }
     } catch (error) {
-      setError(error.response?.data?.message || 'An error occurred during signup');
+      setError(
+        error.response?.data?.message || "An error occurred during signup"
+      );
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleGoogleLoginSuccess = async (credentialResponse: any) => {
     try {
       setLoading(true);
-      setError('');
-      
-      console.log('Google login response:', credentialResponse);
-      
+      setError("");
+
+      console.log("Google login response:", credentialResponse);
+
       // Send the credential token to your backend with the role
-      const response = await axios.post('http://localhost:5000/api/auth/google/token', {
-        credential: credentialResponse.credential,
-        role: 'manager' // Hardcode the role to match the component purpose
-      });
-  
-      console.log('Google authentication successful:', response.data);
-      
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/google/token",
+        {
+          credential: credentialResponse.credential,
+          role: "manager", // Hardcode the role to match the component purpose
+        }
+      );
+
+      console.log("Google authentication successful:", response.data);
+
       // Save token and user data
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("managerData", JSON.stringify(response.data.user));
+
       // Redirect to appropriate dashboard
-      navigate('/manager/dashboard');
+      navigate("/manager/dashboard");
     } catch (err: any) {
-      console.error('Google login error:', err);
-      setError(err.response?.data?.message || 'Google authentication failed');
+      console.error("Google login error:", err);
+      setError(err.response?.data?.message || "Google authentication failed");
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLoginError = () => {
-    setError('Google login failed. Please try again.');
+    setError("Google login failed. Please try again.");
   };
-  
 
   const handleOTPVerification = async (otp: string) => {
     try {
       setOtpError(""); // Clear previous OTP errors
-      const response = await axios.post('http://localhost:5000/api/auth/signup/verify', {
-        email: tempEmail,
-        otp,
-        role: 'manager' // Make sure role is passed in verification
-      });
-  
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/signup/verify",
+        {
+          email: tempEmail,
+          otp,
+          role: "manager", // Make sure role is passed in verification
+        }
+      );
+
       if (response.data.success) {
-        localStorage.setItem('token', response.data.token);
-        navigate('/manager/dashboard'); // Navigate to manager dashboard
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("managerData", JSON.stringify(response.data.user))
+        navigate("/manager/dashboard"); // Navigate to manager dashboard
         return true;
       }
     } catch (error) {
       if (error.response) {
-        setOtpError(error.response.data.message || 'Invalid OTP. Please try again.');
+        setOtpError(
+          error.response.data.message || "Invalid OTP. Please try again."
+        );
       } else if (error.request) {
-        setOtpError('No response from server. Please check your connection.');
+        setOtpError("No response from server. Please check your connection.");
       } else {
-        setOtpError('Error verifying OTP. Please try again later.');
+        setOtpError("Error verifying OTP. Please try again later.");
       }
       return false;
     }
@@ -133,145 +175,198 @@ const ManagerSignup: React.FC = () => {
 
   const handleResendOTP = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/signup/resend', {
-        email: tempEmail,
-        role: 'manager'
-      });
-      
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/signup/resend",
+        {
+          email: tempEmail,
+          role: "manager",
+        }
+      );
+
       return response.data.success;
     } catch (error) {
-      setOtpError('Failed to resend OTP. Please try again.');
+      setOtpError("Failed to resend OTP. Please try again.");
       return false;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 py-12 px-4 sm:px-6 lg:px-8 flex items-center">
-      <div className="max-w-md w-full space-y-8 bg-gray-800 p-10 rounded-xl shadow-lg mx-auto">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">Create Manager Account 🚀</h2>
-          <p className="mt-2 text-center text-sm text-gray-400">
-            Already have an account?{" "}
-            <a href="/login" className="font-medium text-blue-500 hover:text-blue-400">
-              Sign in
-            </a>
-          </p>
-        </div>
+    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">
+            Create Manager Account
+          </CardTitle>
+          <CardDescription className="text-center">
+            Enter your information to create an account
+          </CardDescription>
+        </CardHeader>
 
         {error && (
-          <div className="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded flex items-center">
-            <AlertCircle className="w-5 h-5 mr-2" />
-            {error}
+          <div className="px-6">
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           </div>
         )}
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="name" className="text-gray-300">
-                Full Name
-              </Label>
-              <div className="mt-1 relative">
-                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   id="name"
                   type="text"
-                  {...register("name")}
-                  className="pl-10 bg-gray-700 text-white border-gray-600 focus:border-blue-500 focus:ring-blue-500"
+                  className="pl-10"
                   placeholder="John Doe"
+                  {...register("name")}
                 />
               </div>
-              {errors.name && <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>}
+              {errors.name && (
+                <p className="text-sm text-red-500">{errors.name.message}</p>
+              )}
             </div>
 
-            <div>
-              <Label htmlFor="email" className="text-gray-300">
-                Email address
-              </Label>
-              <div className="mt-1 relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <div className="space-y-2">
+              <Label htmlFor="email">Email Address</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   id="email"
                   type="email"
-                  {...register("email")}
-                  className="pl-10 bg-gray-700 text-white border-gray-600 focus:border-blue-500 focus:ring-blue-500"
+                  className="pl-10"
                   placeholder="you@example.com"
+                  {...register("email")}
                 />
               </div>
-              {errors.email && <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>}
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email.message}</p>
+              )}
             </div>
 
-            <div>
-              <Label htmlFor="phoneNumber" className="text-gray-300">
-                Phone Number
-              </Label>
-              <div className="mt-1 relative">
-                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <div className="space-y-2">
+              <Label htmlFor="phoneNumber">Phone Number</Label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   id="phoneNumber"
                   type="tel"
-                  {...register("phoneNumber")}
-                  className="pl-10 bg-gray-700 text-white border-gray-600 focus:border-blue-500 focus:ring-blue-500"
+                  className="pl-10"
                   placeholder="1234567890"
+                  {...register("phoneNumber")}
                 />
               </div>
-              {errors.phoneNumber && <p className="mt-1 text-sm text-red-500">{errors.phoneNumber.message}</p>}
+              {errors.phoneNumber && (
+                <p className="text-sm text-red-500">
+                  {errors.phoneNumber.message}
+                </p>
+              )}
             </div>
 
-            <div>
-              <Label htmlFor="password" className="text-gray-300">
-                Password
-              </Label>
-              <div className="mt-1 relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <div className="space-y-2">
+              <Label htmlFor="password">Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   id="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"} // Corrected line
+                  placeholder="Enter your password"
+                  className="pl-10"
                   {...register("password")}
-                  className="pl-10 bg-gray-700 text-white border-gray-600 focus:border-blue-500 focus:ring-blue-500"
                 />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-500 focus:outline-none"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
-              {errors.password && <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>}
+              {errors.password && (
+                <p className="text-sm text-red-500">
+                  {errors.password.message}
+                </p>
+              )}
             </div>
 
-            <div>
-              <Label htmlFor="confirmPassword" className="text-gray-300">
-                Confirm Password
-              </Label>
-              <div className="mt-1 relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                 <Input
                   id="confirmPassword"
-                  type="password"
+                  type={showPassword ? "text" : "password"} // Corrected line
+                  placeholder="Enter your password"
+                  className="pl-10"
                   {...register("confirmPassword")}
-                  className="pl-10 bg-gray-700 text-white border-gray-600 focus:border-blue-500 focus:ring-blue-500"
                 />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-500 focus:outline-none"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
               </div>
-              {errors.confirmPassword && <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>}
+              {errors.confirmPassword && (
+                <p className="text-sm text-red-500">
+                  {errors.confirmPassword.message}
+                </p>
+              )}
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? "Creating account..." : "Create Account"}
+            </Button>
+          </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <Separator />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Or continue with
+              </span>
             </div>
           </div>
 
-          <div>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full bg-blue-600 hover:bg-blue-700 focus:ring-blue-500 focus:ring-offset-gray-800"
-            >
-              {isSubmitting ? "Creating account... ⏳" : "Sign up 🎉"}
-            </Button>
+          <div className="flex justify-center">
+            <GoogleLogin
+              onSuccess={handleGoogleLoginSuccess}
+              onError={handleGoogleLoginError}
+              useOneTap
+              logo_alignment="center"
+              text="continue_with"
+              shape="rectangular"
+            />
           </div>
-           <div className="text-center">
-                    <GoogleLogin
-                            onSuccess={handleGoogleLoginSuccess}
-                            onError={handleGoogleLoginError}
-                            useOneTap
-                            logo_alignment="center"
-                            text="continue_with"
-                            shape="rectangular"
-                          />
-                  </div>
-        </form>
-      </div>
+        </CardContent>
+
+        <CardFooter className="flex justify-center">
+          <p className="text-sm text-muted-foreground">
+            Already have an account?{" "}
+            <span
+              className="font-medium text-primary hover:underline cursor-pointer"
+              onClick={() => navigate("/manager")}
+            >
+              Sign in
+            </span>
+          </p>
+        </CardFooter>
+      </Card>
+
       <OTPModal
         isOpen={isOTPModalOpen}
         onClose={() => setIsOTPModalOpen(false)}
@@ -280,7 +375,7 @@ const ManagerSignup: React.FC = () => {
         error={otpError}
       />
     </div>
-  )
-}
+  );
+};
 
-export default ManagerSignup
+export default ManagerSignup;

@@ -26,7 +26,7 @@ const loginSchema = yup.object({
   password: yup.string().required("Password is required"),
 })
 
-const CompanyAdminLogin: React.FC = () => {
+const ManagerLogin: React.FC = () => {
   const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState<boolean>(false)
   const [error, setError] = useState<string>("")
@@ -49,7 +49,7 @@ const CompanyAdminLogin: React.FC = () => {
         {
           email: data.email,
           password: data.password,
-          role: "companyAdmin", // Add role parameter
+          role: "manager", // Add role parameter
         },
         {
           headers: {
@@ -61,10 +61,10 @@ const CompanyAdminLogin: React.FC = () => {
       if (response.data.success) {
         // Store token and user data
         localStorage.setItem("token", response.data.token)
-        localStorage.setItem("companyAdminData", JSON.stringify(response.data.user))
+        localStorage.setItem("managerData", JSON.stringify(response.data.user))
 
         // Redirect to developer dashboard
-        navigate("/companyadmin/dashboard")
+        navigate("/manager/dashboard")
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || "An error occurred during login"
@@ -86,17 +86,17 @@ const CompanyAdminLogin: React.FC = () => {
       // Send the credential token to your backend with the role
       const response = await axios.post("http://localhost:5000/api/auth/google/token", {
         credential: credentialResponse.credential,
-        role: "companyAdmin", // Hardcode the role to match the component purpose
+        role: "manager", // Hardcode the role to match the component purpose
       })
 
       console.log("Google authentication successful:", response.data)
 
       // Save token and user data
       localStorage.setItem("token", response.data.token)
-      localStorage.setItem("companyAdminData", JSON.stringify(response.data.user))
+      localStorage.setItem("managerData", JSON.stringify(response.data.user))
 
       // Redirect to appropriate dashboard
-      navigate("/companyadmin/dashboard")
+      navigate("/manager/dashboard")
     } catch (err: any) {
       console.error("Google login error:", err)
       setError(err.response?.data?.message || "Google authentication failed")
@@ -114,7 +114,7 @@ const CompanyAdminLogin: React.FC = () => {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
-          <CardDescription className="text-center">Sign in to your Project Manager account</CardDescription>
+          <CardDescription className="text-center">Sign in to your Manager account</CardDescription>
         </CardHeader>
 
         {error && (
@@ -195,7 +195,7 @@ const CompanyAdminLogin: React.FC = () => {
             Don't have an account?{" "}
             <span
               className="font-medium text-primary hover:underline cursor-pointer"
-              onClick={() => navigate("/companyadmin/signup")}
+              onClick={() => navigate("/manager/signup")}
             >
               Sign up
             </span>
@@ -206,5 +206,5 @@ const CompanyAdminLogin: React.FC = () => {
   )
 }
 
-export default CompanyAdminLogin
+export default ManagerLogin
 

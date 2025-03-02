@@ -53,7 +53,7 @@ const AdminLogin = () => {
       if (response.data.success) {
         // Store token and user data
         localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
+        localStorage.setItem("adminData", JSON.stringify(response.data.user));
 
         // Redirect to admin dashboard
         navigate("/admin/dashboard");
@@ -73,7 +73,7 @@ const AdminLogin = () => {
       <div className="max-w-md w-full space-y-8 bg-gray-800 p-10 rounded-xl shadow-lg mx-auto">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-            Welcome back! 👋
+            Welcome back! 
           </h2>
           <p className="mt-2 text-center text-sm text-gray-400">
             Sign in to your admin account
