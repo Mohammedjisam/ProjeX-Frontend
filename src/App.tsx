@@ -7,6 +7,7 @@ import ManagerRoutes from './routes/ManagerRoutes';
 import ProjectManagerRoutes from './routes/ProjectManagerRoutes';
 import DeveloperRoutes from './routes/DeveloperRoutes';
 import { store } from './redux/Store';
+import NotFound from './pages/NotFound';
 
 
 
@@ -21,6 +22,7 @@ function App() {
         <Route path='/projectmanager/*' element={<ProjectManagerRoutes/>}/>
         <Route path='/developer/*' element={<DeveloperRoutes/>}/>
         <Route path='/admin/*' element={<AdminRoutes />}/>
+        <Route path="*" element={<NotFound />} />
       </Routes>
       </Provider>
 </BrowserRouter>

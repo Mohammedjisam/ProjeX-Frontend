@@ -1,40 +1,71 @@
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
-import { cn } from "../../lib/utils"
+
+import React from 'react';
+import { motion } from 'framer-motion';
+
+interface Manager {
+  id: number;
+  name: string;
+  avatar: string;
+  projectCount: string;
+  phone: string;
+  location: string;
+  isHighlighted?: boolean;
+}
 
 interface ManagerCardProps {
-  manager: {
-    id: number
-    name: string
-    avatar: string
-    projectCount: string
-    phone: string
-    location: string
-    isHighlighted?: boolean
-  }
+  manager: Manager;
+  delay?: number;
 }
 
-export default function ManagerCard({ manager }: ManagerCardProps) {
+const ManagerCard: React.FC<ManagerCardProps> = ({ manager, delay = 0 }) => {
   return (
-    <div
-      className={cn(
-        "bg-[#22233d] rounded-xl p-6 flex flex-col items-center",
-        manager.isHighlighted && "ring-2 ring-blue-500",
-      )}
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: delay * 0.1 }}
+      className={`glassmorphism hover-scale rounded-xl overflow-hidden ${
+        manager.isHighlighted ? 'border border-indigo-500/50' : 'border border-white/10'
+      }`}
     >
-      <div className="relative mb-2">
-        <Avatar className="h-16 w-16">
-          <AvatarImage src={manager.avatar} alt={manager.name} />
-          <AvatarFallback>{manager.name.charAt(0)}</AvatarFallback>
-        </Avatar>
-        <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-[#22233d]"></span>
+      <div className="p-6">
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: delay * 0.1 + 0.2 }}
+          className="flex items-center mb-6"
+        >
+          <div className="w-14 h-14 rounded-full overflow-hidden mr-4 border-2 border-white/10">
+            <img 
+              src={manager.avatar} 
+              alt={manager.name} 
+              className="w-full h-full object-cover" 
+              loading="lazy"
+            />
+          </div>
+          <div>
+            <h3 className="text-lg font-medium text-white">{manager.name}</h3>
+            {/* <p className="text-xs text-gray-400">{manager.location}</p> */}
+          </div>
+        </motion.div>
+        
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: delay * 0.1 + 0.3 }}
+          className="flex justify-between items-center text-sm"
+        >
+          <div className="bg-white/5 rounded-lg p-3 w-full mr-2">
+            <p className="text-gray-400 mb-1 text-xs">Projects</p>
+            <p className="text-white font-medium">{manager.projectCount}</p>
+          </div>
+          <div className="bg-white/5 rounded-lg p-3 w-full">
+            <p className="text-gray-400 mb-1 text-xs">Phone</p>
+            <p className="text-white font-medium">{manager.phone}</p>
+          </div>
+        </motion.div>
       </div>
+    </motion.div>
+  );
+};
 
-      <h3 className="text-sm font-medium">{manager.name}</h3>
-      <p className="text-sm text-gray-400 mt-4">Projects : {manager.projectCount}</p>
-      <p className="text-sm text-gray-400">phone: {manager.phone}</p>
-
-      <div className="mt-4 text-xs text-gray-500">{manager.location}</div>
-    </div>
-  )
-}
-
+export default ManagerCard;
