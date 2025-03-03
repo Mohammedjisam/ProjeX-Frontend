@@ -14,12 +14,12 @@ interface FormData {
   phoneNumber: string
 }
 
-interface AddManagerFormProps {
+interface AddProjectManagerFormProps {
   onSuccess?: () => void
   onCancel?: () => void
 }
 
-const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) => {
+const AddProjectManagerForm: React.FC<AddProjectManagerFormProps> = ({ onSuccess, onCancel }) => {
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -33,7 +33,7 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
     const newErrors: Record<string, string> = {}
 
     if (!formData.name.trim()) {
-      newErrors.name = "Manager name is required"
+      newErrors.name = " Project Manager name is required"
     }
 
     if (!formData.email.trim()) {
@@ -74,10 +74,10 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
     try {
       // Create manager without password - password setup email will be sent
       // Fix the API endpoint to match the backend route
-      const response = await axiosInstance.post("/companyadmin/addnewmanager", formData)
+      const response = await axiosInstance.post("/manager/addnewprojectmanager", formData)
 
       if (response.data.success) {
-        toast.success("Manager added successfully. Password setup email sent.")
+        toast.success(" Project Manager added successfully. Password setup email sent.")
 
         // Reset form
         setFormData({
@@ -91,10 +91,10 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
           onSuccess()
         }
       } else {
-        toast.error(response.data.message || "Failed to add manager")
+        toast.error(response.data.message || "Failed to add project manager")
       }
     } catch (err) {
-      let errorMessage = "Failed to add manager"
+      let errorMessage = "Failed to add ProjectManager"
 
       if (axios.isAxiosError(err)) {
         // Add more detailed error logging
@@ -110,7 +110,7 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
       }
 
       toast.error(errorMessage)
-      console.error("Error adding manager:", err)
+      console.error("Error adding Project Manager:", err)
     } finally {
       setLoading(false)
     }
@@ -126,7 +126,7 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
       <div className="flex items-center justify-between bg-indigo-600 px-6 py-4">
         <div className="flex items-center">
           <UserPlus className="h-6 w-6 text-white mr-2" />
-          <h2 className="text-xl font-semibold text-white">Add New Manager</h2>
+          <h2 className="text-xl font-semibold text-white">Add New Project Manager</h2>
         </div>
         {onCancel && (
           <button onClick={onCancel} className="text-white hover:text-gray-200 transition-colors" aria-label="Close">
@@ -138,7 +138,7 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
       <form onSubmit={handleSubmit} className="px-6 py-5 space-y-5">
         <div className="space-y-2">
           <label htmlFor="name" className="block text-sm font-medium text-gray-200">
-            Manager Name
+          Project Manager Name
           </label>
           <div className="relative rounded-md shadow-sm">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -153,7 +153,7 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
               className={`bg-[#272D3D] text-white pl-10 pr-3 py-3 block w-full rounded-md border ${
                 errors.name ? "border-red-500" : "border-gray-600"
               } focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent`}
-              placeholder="Enter manager name"
+              placeholder="Enter project manager name"
             />
           </div>
           {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
@@ -206,7 +206,7 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
         </div>
 
         <div className="pt-2 text-sm text-gray-400">
-          <p>An email will be sent to the manager with instructions to set up their password.</p>
+          <p>An email will be sent to the project manager with instructions to set up their password.</p>
         </div>
 
         <div className="pt-4">
@@ -237,7 +237,7 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
             ) : (
               <>
                 <Save className="h-5 w-5 mr-2" />
-                Add Manager
+                Add Project Manager
               </>
             )}
           </button>
@@ -247,5 +247,5 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
   )
 }
 
-export default AddManagerForm
+export default AddProjectManagerForm
 

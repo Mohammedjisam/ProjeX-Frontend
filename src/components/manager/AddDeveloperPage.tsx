@@ -3,14 +3,14 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import AddManagerForm from './AddManagerForm';
+import AddDeveloperForm from './AddDeveloperForm';
 
-const AddManagerPage: React.FC = () => {
+const AddDeveloperPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSuccess = () => {
     // Redirect to dashboard or managers list after successful submission
-    navigate('/companyadmin/managers');
+    navigate('/manager/developers');
   };
 
   return (
@@ -20,7 +20,7 @@ const AddManagerPage: React.FC = () => {
         <Header />
         <main className="flex-1 overflow-y-auto p-8">
           <div className="max-w-md mx-auto mt-10">
-            <AddManagerForm onSuccess={handleSuccess} />
+            <AddDeveloperForm onSuccess={handleSuccess} />
           </div>
         </main>
       </div>
@@ -28,4 +28,4 @@ const AddManagerPage: React.FC = () => {
   );
 };
 
-export default AddManagerPage;
+export default AddDeveloperPage;

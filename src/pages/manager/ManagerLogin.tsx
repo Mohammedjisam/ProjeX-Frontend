@@ -16,6 +16,7 @@ import { Alert, AlertDescription } from "../../components/ui/alert"
 import { Separator } from "../../components/ui/separator"
 import { GoogleLogin } from "@react-oauth/google"
 import { motion } from "framer-motion"
+import axiosInstance from "../../utils/AxiosConfig"
 
 interface LoginFormInputs {
   email: string
@@ -51,8 +52,7 @@ const ManagerLogin: React.FC = () => {
       setError("")
       setLoading(true)
 
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/auth/login`,
+      const response = await axiosInstance.post("/auth/login",
         {
           email: data.email,
           password: data.password,
