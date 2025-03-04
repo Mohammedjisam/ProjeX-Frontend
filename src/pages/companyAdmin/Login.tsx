@@ -1,11 +1,9 @@
 "use client"
-
 import type React from "react"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -15,6 +13,8 @@ import { AlertCircle, Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { Alert, AlertDescription } from "../../components/ui/alert"
 import { Separator } from "../../components/ui/separator"
 import { GoogleLogin } from "@react-oauth/google"
+import axiosInstance from "../../utils/AxiosConfig"
+import { toast } from "sonner"
 
 interface LoginFormInputs {
   email: string
@@ -44,12 +44,12 @@ const CompanyAdminLogin: React.FC = () => {
     try {
       setError("")
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+      const response = await axiosInstance.post(
+        "/auth/login",
         {
           email: data.email,
           password: data.password,
-          role: "companyAdmin", // Add role parameter
+          role: "companyAdmin", 
         },
         {
           headers: {
@@ -59,16 +59,28 @@ const CompanyAdminLogin: React.FC = () => {
       )
 
       if (response.data.success) {
-        // Store token and user data
+        toast.success("Login successful! Redirecting to dashboard...", {
+          style: {
+            backgroundColor: "#10B981",
+            color: "white",
+          },
+        })
+        
         localStorage.setItem("token", response.data.token)
         localStorage.setItem("companyAdminData", JSON.stringify(response.data.user))
 
-        // Redirect to developer dashboard
         navigate("/companyadmin/dashboard")
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || "An error occurred during login"
       setError(errorMessage)
+      
+      toast.error(errorMessage, {
+        style: {
+          backgroundColor: "#EF4444",
+          color: "white",
+        },
+      })
     }
   }
 
@@ -83,34 +95,55 @@ const CompanyAdminLogin: React.FC = () => {
 
       console.log("Google login response:", credentialResponse)
 
-      // Send the credential token to your backend with the role
-      const response = await axios.post("http://localhost:5000/api/auth/google/token", {
+      const response = await axiosInstance.post("/auth/google/token", {
         credential: credentialResponse.credential,
-        role: "companyAdmin", // Hardcode the role to match the component purpose
+        role: "companyAdmin", 
       })
 
       console.log("Google authentication successful:", response.data)
 
-      // Save token and user data
+      toast.success("Google login successful! Redirecting to dashboard...", {
+        style: {
+          backgroundColor: "#10B981",
+          color: "white",
+        },
+      })
+
       localStorage.setItem("token", response.data.token)
       localStorage.setItem("companyAdminData", JSON.stringify(response.data.user))
 
-      // Redirect to appropriate dashboard
       navigate("/companyadmin/dashboard")
     } catch (err: any) {
       console.error("Google login error:", err)
-      setError(err.response?.data?.message || "Google authentication failed")
+      const errorMessage = err.response?.data?.message || "Google authentication failed"
+      setError(errorMessage)
+      
+      toast.error(errorMessage, {
+        style: {
+          backgroundColor: "#EF4444",
+          color: "white",
+        },
+      })
     } finally {
       setLoading(false)
     }
   }
 
   const handleGoogleLoginError = () => {
-    setError("Google login failed. Please try again.")
+    const errorMessage = "Google login failed. Please try again."
+    setError(errorMessage)
+    
+    toast.error(errorMessage, {
+      style: {
+        backgroundColor: "#EF4444",
+        color: "white",
+      },
+    })
   }
 
+
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+    <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>

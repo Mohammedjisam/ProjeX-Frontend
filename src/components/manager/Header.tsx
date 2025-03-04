@@ -15,8 +15,8 @@ export default function Header() {
 
         <div className="flex items-center space-x-3 pl-4 border-l border-gray-800">
           <div className="flex flex-col items-end">
-            <span className="text-sm font-medium">Ram</span>
-            <span className="text-xs text-gray-400">ram@gmail.com</span>
+            <span className="text-sm font-medium">Jisam</span>
+            <span className="text-xs text-gray-400">jisam@gmail.com</span>
           </div>
           <div className="h-9 w-9 rounded-full bg-gray-700 flex items-center justify-center overflow-hidden">
             <User className="h-5 w-5 text-gray-300" />

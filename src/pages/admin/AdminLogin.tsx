@@ -1,14 +1,15 @@
-import type React from "react";
+import React from "react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import axios from "axios";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { AlertCircle, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import axiosInstance from "../../utils/AxiosConfig";
 
 interface LoginFormInputs {
   email: string;
@@ -36,8 +37,8 @@ const AdminLogin = () => {
     try {
       setError("");
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+      const response = await axiosInstance.post(
+        "/auth/login",
         {
           email: data.email,
           password: data.password,
@@ -51,19 +52,30 @@ const AdminLogin = () => {
       );
 
       if (response.data.success) {
-        // Store token and user data
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("adminData", JSON.stringify(response.data.user));
+        toast.success("Login successful! Redirecting to dashboard...", {
+          style: { 
+            backgroundColor: "#10B981", 
+            color: "white" 
+          }
+        });
 
-        // Redirect to admin dashboard
         navigate("/admin/dashboard");
       }
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || "An error occurred during login";
       setError(errorMessage);
+        toast.error(errorMessage, {
+        style: { 
+          backgroundColor: "#EF4444", 
+          color: "white" 
+        }
+      });
     }
   };
+  
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };

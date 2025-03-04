@@ -15,7 +15,6 @@ interface ProjectManager {
   role?: string
 }
 
-// Interface for Project data
 interface ProjectData {
   name: string
   description: string
@@ -34,7 +33,6 @@ const AddNewProject: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [projectManagers, setProjectManagers] = useState<ProjectManager[]>([])
 
-  // Initialize project data state
   const [projectData, setProjectData] = useState<ProjectData>({
     name: "",
     description: "",
@@ -48,7 +46,6 @@ const AddNewProject: React.FC = () => {
     comments: "",
   })
 
-  // Fetch project managers on component mount
   useEffect(() => {
     const fetchProjectManagers = async () => {
       try {
@@ -62,7 +59,6 @@ const AddNewProject: React.FC = () => {
         const response = await axiosInstance.get(`/manager/getallprojectmanager`)
         console.log("Project managers response:", response.data)
 
-        // Use the data directly without filtering
         if (response.data.success && response.data.data) {
           setProjectManagers(response.data.data)
         } else {
@@ -77,7 +73,6 @@ const AddNewProject: React.FC = () => {
     fetchProjectManagers()
   }, [navigate])
 
-  // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setProjectData({
@@ -86,7 +81,6 @@ const AddNewProject: React.FC = () => {
     })
   }
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -99,7 +93,6 @@ const AddNewProject: React.FC = () => {
         return
       }
 
-      // Format data for API
       const formattedData = {
         ...projectData,
         budget: projectData.budget === "" ? 0 : Number(projectData.budget),
@@ -114,7 +107,7 @@ const AddNewProject: React.FC = () => {
 
       if (response.data.success) {
         toast.success("Project created successfully")
-        navigate("/manager/projects") // Navigate to projects list
+        navigate("/manager/projects") 
       } else {
         toast.error(response.data.message || "Failed to create project")
       }
@@ -129,10 +122,10 @@ const AddNewProject: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-[#0f121b]">
-      {/* Sidebar */}
+     
       <Sidebar />
 
-      {/* Main Content */}
+ 
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
 

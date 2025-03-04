@@ -1,34 +1,35 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
-import { Button } from "../../components/ui/button"
-import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
-import { Separator } from "../../components/ui/separator"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
-import { AlertCircle, Mail, Lock, Eye, EyeOff, Loader2, LogIn } from "lucide-react"
-import { GoogleLogin } from "@react-oauth/google"
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Separator } from "../../components/ui/separator";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card";
+import { AlertCircle, Mail, Lock, Eye, EyeOff, Loader2, LogIn } from "lucide-react";
+import { GoogleLogin } from "@react-oauth/google";
+import axiosInstance from "../../utils/AxiosConfig";
 
 interface LoginFormInputs {
-  email: string
-  password: string
+  email: string;
+  password: string;
 }
 
-const loginSchema = yup.object({
+const loginSchema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
   password: yup.string().required("Password is required"),
-})
+});
 
 const DeveloperLogin = () => {
-  const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [error, setError] = useState<string>("")
-  const [loading, setLoading] = useState(false)
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [error, setError] = useState<string>("");
+  const [loading, setLoading] = useState(false);
 
   const {
     register,
@@ -36,14 +37,14 @@ const DeveloperLogin = () => {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormInputs>({
     resolver: yupResolver(loginSchema),
-  })
+  });
 
   const onSubmit = async (data: LoginFormInputs) => {
     try {
-      setError("")
+      setError("");
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+      const response = await axiosInstance.post(
+        "/auth/login",
         {
           email: data.email,
           password: data.password,
@@ -54,46 +55,53 @@ const DeveloperLogin = () => {
             "Content-Type": "application/json",
           },
         },
-      )
+      );
 
       if (response.data.success) {
-        localStorage.setItem("token", response.data.token)
-        localStorage.setItem("developerData", JSON.stringify(response.data.user))
-        navigate("/developer/dashboard")
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("developerData", JSON.stringify(response.data.user));
+        toast.success("Login successful! Redirecting to dashboard...");
+        navigate("/developer/dashboard");
       }
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "An error occurred during login"
-      setError(errorMessage)
+      const errorMessage = error.response?.data?.message || "An error occurred during login";
+      toast.error(errorMessage);
+      setError(errorMessage);
     }
-  }
+  };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword)
-  }
+    setShowPassword(!showPassword);
+  };
 
   const handleGoogleLoginSuccess = async (credentialResponse: any) => {
     try {
-      setLoading(true)
-      setError("")
+      setLoading(true);
+      setError("");
 
-      const response = await axios.post("http://localhost:5000/api/auth/google/token", {
+      const response = await axiosInstance.post("/auth/google/token", {
         credential: credentialResponse.credential,
         role: "developer",
-      })
+      });
 
-      localStorage.setItem("token", response.data.token)
-      localStorage.setItem("developerData", JSON.stringify(response.data.user))
-      navigate("/developer/dashboard")
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("developerData", JSON.stringify(response.data.user));
+      toast.success("Google login successful! Redirecting to dashboard...");
+      navigate("/developer/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Google authentication failed")
+      const errorMessage = err.response?.data?.message || "Google authentication failed";
+      toast.error(errorMessage);
+      setError(errorMessage);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleGoogleLoginError = () => {
-    setError("Google login failed. Please try again.")
-  }
+    const errorMessage = "Google login failed. Please try again.";
+    toast.error(errorMessage);
+    setError(errorMessage);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
@@ -221,8 +229,7 @@ const DeveloperLogin = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DeveloperLogin
-
+export default DeveloperLogin;

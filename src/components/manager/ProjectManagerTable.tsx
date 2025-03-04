@@ -62,7 +62,6 @@ const ProjectManagersTable: React.FC = () => {
 
   const handleBlock = (id: string) => {
     toast.info(`Blocking project manager with ID: ${id}`);
-    // Implementation for blocking a project manager would go here
   };
 
   const handleDelete = async (id: string) => {

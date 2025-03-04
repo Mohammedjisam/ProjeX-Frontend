@@ -1,14 +1,13 @@
 import axios from "axios"
 
 const axiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api", // Make sure this matches your backend server
+  baseURL: "http://localhost:5000/api",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
   },
 })
 
-// Add request interceptor to include auth token
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token")
@@ -22,13 +21,10 @@ axiosInstance.interceptors.request.use(
   },
 )
 
-// Add response interceptor for error handling
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Handle session expiration
     if (error.response && error.response.status === 401) {
-      // Optionally redirect to login page or refresh token
       localStorage.removeItem("token")
       window.location.href = "/login"
     }

@@ -15,7 +15,6 @@ interface ProjectManager {
   role?: string
 }
 
-// Interface for Project data
 interface ProjectData {
   name: string
   description: string
@@ -36,7 +35,6 @@ const EditProject: React.FC = () => {
   const [isFetching, setIsFetching] = useState(true)
   const [projectManagers, setProjectManagers] = useState<ProjectManager[]>([])
 
-  // Initialize project data state
   const [projectData, setProjectData] = useState<ProjectData>({
     name: "",
     description: "",
@@ -50,7 +48,6 @@ const EditProject: React.FC = () => {
     comments: "",
   })
 
-  // Fetch project data and project managers on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -61,7 +58,6 @@ const EditProject: React.FC = () => {
           return
         }
 
-        // Fetch project managers
         const managersResponse = await axiosInstance.get(`/manager/getallprojectmanager`, {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -72,7 +68,6 @@ const EditProject: React.FC = () => {
           toast.error("Failed to load project managers data")
         }
 
-        // Fetch project details
         const projectResponse = await axiosInstance.get(`/project/getallprojects/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
@@ -80,7 +75,6 @@ const EditProject: React.FC = () => {
         if (projectResponse.data.success && projectResponse.data.data) {
           const project = projectResponse.data.data
 
-          // Format dates for input fields (YYYY-MM-DD)
           const formatDate = (dateString: string) => {
             const date = new Date(dateString)
             return date.toISOString().split("T")[0]
@@ -114,7 +108,6 @@ const EditProject: React.FC = () => {
     fetchData()
   }, [id, navigate])
 
-  // Handle form input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setProjectData({
@@ -123,7 +116,6 @@ const EditProject: React.FC = () => {
     })
   }
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -132,11 +124,9 @@ const EditProject: React.FC = () => {
       const token = localStorage.getItem("token")
       if (!token) {
         toast.error("Authentication required")
-        navigate("/manager/login") // Fixed path
+        navigate("/manager/login")
         return
       }
-
-      // Format data for API - only send fields that are in the backend controller
       const formattedData = {
         name: projectData.name,
         description: projectData.description,
@@ -147,7 +137,6 @@ const EditProject: React.FC = () => {
         projectManager: projectData.projectManager,
         goal: projectData.goal,
         status: projectData.status,
-        // Don't send comments as the backend doesn't handle it in updateProject
       }
 
       const response = await axiosInstance.put(`/project/updateproject/${id}`, formattedData, {
@@ -159,7 +148,7 @@ const EditProject: React.FC = () => {
 
       if (response.data.success) {
         toast.success("Project updated successfully")
-        navigate(`/manager/projects/view/${id}`) // Fixed path to match your router
+        navigate(`/manager/projects`)
       } else {
         toast.error(response.data.message || "Failed to update project")
       }
@@ -168,7 +157,6 @@ const EditProject: React.FC = () => {
       const errorMessage = error.response?.data?.message || "An error occurred while updating the project"
       toast.error(errorMessage)
 
-      // Handle validation errors
       if (error.response?.data?.errors) {
         error.response.data.errors.forEach((err: any) => {
           toast.error(`${err.field}: ${err.message}`)
@@ -181,10 +169,8 @@ const EditProject: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-[#0f121b]">
-      {/* Sidebar */}
       <Sidebar />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
 
@@ -202,7 +188,6 @@ const EditProject: React.FC = () => {
               ) : (
                 <form onSubmit={handleSubmit} className="p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Project Name */}
                     <div className="col-span-1">
                       <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
                         Project Name*
@@ -219,7 +204,6 @@ const EditProject: React.FC = () => {
                       />
                     </div>
 
-                    {/* Goal */}
                     <div className="col-span-1">
                       <label htmlFor="goal" className="block text-sm font-medium text-gray-300 mb-1">
                         Goal*
@@ -236,7 +220,6 @@ const EditProject: React.FC = () => {
                       />
                     </div>
 
-                    {/* Description */}
                     <div className="col-span-2">
                       <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-1">
                         Description*
@@ -253,7 +236,6 @@ const EditProject: React.FC = () => {
                       />
                     </div>
 
-                    {/* Client Name */}
                     <div className="col-span-1">
                       <label htmlFor="clientName" className="block text-sm font-medium text-gray-300 mb-1">
                         Client Name*
@@ -270,7 +252,6 @@ const EditProject: React.FC = () => {
                       />
                     </div>
 
-                    {/* Budget */}
                     <div className="col-span-1">
                       <label htmlFor="budget" className="block text-sm font-medium text-gray-300 mb-1">
                         Budget*
@@ -288,7 +269,6 @@ const EditProject: React.FC = () => {
                       />
                     </div>
 
-                    {/* Start Date */}
                     <div className="col-span-1">
                       <label htmlFor="startDate" className="block text-sm font-medium text-gray-300 mb-1">
                         Start Date*
@@ -304,7 +284,6 @@ const EditProject: React.FC = () => {
                       />
                     </div>
 
-                    {/* End Date */}
                     <div className="col-span-1">
                       <label htmlFor="endDate" className="block text-sm font-medium text-gray-300 mb-1">
                         End Date*
@@ -320,7 +299,6 @@ const EditProject: React.FC = () => {
                       />
                     </div>
 
-                    {/* Project Manager */}
                     <div className="col-span-1">
                       <label htmlFor="projectManager" className="block text-sm font-medium text-gray-300 mb-1">
                         Project Manager*
@@ -342,7 +320,6 @@ const EditProject: React.FC = () => {
                       </select>
                     </div>
 
-                    {/* Status */}
                     <div className="col-span-1">
                       <label htmlFor="status" className="block text-sm font-medium text-gray-300 mb-1">
                         Status
@@ -361,7 +338,6 @@ const EditProject: React.FC = () => {
                       </select>
                     </div>
 
-                    {/* Comments */}
                     <div className="col-span-2">
                       <label htmlFor="comments" className="block text-sm font-medium text-gray-300 mb-1">
                         Comments

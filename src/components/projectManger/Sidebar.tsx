@@ -53,11 +53,11 @@ const Sidebar: React.FC = () => {
       <div className="p-4 border-t border-white/10 mt-auto">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-full bg-dashboard-blue flex items-center justify-center text-white font-medium flex-shrink-0">
-            R
+            J
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">Ram</p>
-            <p className="text-xs text-white/50 truncate">ram@gmail.com</p>
+            <p className="text-sm font-medium text-white truncate">Jecob</p>
+            <p className="text-xs text-white/50 truncate">jecob@gmail.com</p>
           </div>
         </div>
       </div>

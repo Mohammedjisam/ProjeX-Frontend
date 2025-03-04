@@ -59,7 +59,6 @@ const NotFound = () => {
         "mt-8 text-sm text-gray-500 transition-all duration-1000 delay-300",
         mounted ? "opacity-100" : "opacity-0"
       )}>
-        Path: <span className="font-mono text-gray-400">{location.pathname}</span>
       </div>
     </div>
   );

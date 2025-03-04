@@ -5,7 +5,6 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -17,6 +16,7 @@ import { Separator } from "../../components/ui/separator"
 import { GoogleLogin } from "@react-oauth/google"
 import { motion } from "framer-motion"
 import axiosInstance from "../../utils/AxiosConfig"
+import { toast } from "sonner";
 
 interface LoginFormInputs {
   email: string
@@ -67,16 +67,20 @@ const ManagerLogin: React.FC = () => {
       )
 
       if (response.data.success) {
-        // Store token and user data
         localStorage.setItem("token", response.data.token)
         localStorage.setItem("managerData", JSON.stringify(response.data.user))
+        toast.success("Login successful!", {
+          style: { backgroundColor: "#34D399", color: "white" },
+        });
 
-        // Redirect to manager dashboard
         navigate("/manager/dashboard")
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || "An error occurred during login"
       setError(errorMessage)
+      toast.error(errorMessage, {
+        style: { backgroundColor: "#EF4444", color: "white" },
+      });
     } finally {
       setLoading(false)
     }
@@ -91,35 +95,37 @@ const ManagerLogin: React.FC = () => {
       setLoading(true)
       setError("")
 
-      // Send the credential token to your backend with the role
-      const response = await axios.post(
-        `${process.env.REACT_APP_API_URL || "http://localhost:5000"}/api/auth/google/token`, 
+      const response = await axiosInstance.post("auth/google/token", 
         {
           credential: credentialResponse.credential,
           role: "manager",
         }
       )
+      toast.success("Google authentication successful!", {
+        style: { backgroundColor: "#34D399", color: "white" },
+      });
 
-      // Save token and user data
       localStorage.setItem("token", response.data.token)
       localStorage.setItem("managerData", JSON.stringify(response.data.user))
 
-      // Redirect to manager dashboard
       navigate("/manager/dashboard")
     } catch (err: any) {
       console.error("Google login error:", err)
       setError(err.response?.data?.message || "Google authentication failed")
+      toast.error(err.response?.data?.message , {
+        style: { backgroundColor: "#EF4444", color: "white" },
+      });
     } finally {
       setLoading(false)
     }
   }
-
   const handleGoogleLoginError = () => {
-    setError("Google login failed. Please try again.")
+    const errorMessage = "Google login failed. Please try again.";
+    setError(errorMessage);    
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-9000 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

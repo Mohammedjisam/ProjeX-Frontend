@@ -21,7 +21,6 @@ import Sidebar from "./Sidebar"
 import Header from "./Header"
 import axiosInstance from "../../utils/AxiosConfig"
 
-// Interface for Comment data
 interface Comment {
   _id: string
   text: string
@@ -33,7 +32,6 @@ interface Comment {
   createdAt: string
 }
 
-// Interface for Project Manager data
 interface ProjectManager {
   _id: string
   name: string
@@ -41,7 +39,6 @@ interface ProjectManager {
   role: string
 }
 
-// Interface for Project data
 interface ProjectData {
   _id: string
   name: string
@@ -66,7 +63,6 @@ const ViewProject: React.FC = () => {
   const [newComment, setNewComment] = useState<string>("")
   const [submittingComment, setSubmittingComment] = useState<boolean>(false)
 
-  // Fetch project data
   useEffect(() => {
     const fetchProjectData = async () => {
       try {
@@ -107,7 +103,6 @@ const ViewProject: React.FC = () => {
     fetchProjectData()
   }, [id, navigate])
 
-  // Format date for display
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = { year: "numeric", month: "long", day: "numeric" }
     return new Date(dateString).toLocaleDateString(undefined, options)
@@ -131,7 +126,6 @@ const ViewProject: React.FC = () => {
         return;
       }
   
-      // Get current user ID from localStorage - this is the critical fix
       const userId = localStorage.getItem("userId");
       if (!userId) {
         toast.error("User ID not found. Please log in again.");
@@ -139,13 +133,13 @@ const ViewProject: React.FC = () => {
         return;
       }
   
-      console.log("Using userId for comment:", userId); // Debugging log
+      console.log("Using userId for comment:", userId); 
   
       const response = await axiosInstance.post(
         `/project/getallprojects/${id}/comments`,
         {
           text: newComment,
-          authorId: userId, // Use the actual userId from localStorage
+          authorId: userId, 
         },
         {
           headers: {
@@ -164,7 +158,6 @@ const ViewProject: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Error adding comment:", error);
-      // More detailed error handling
       if (error.response) {
         toast.error(`Failed to add comment: ${error.response.data.message || error.response.statusText}`);
       } else {
@@ -175,18 +168,16 @@ const ViewProject: React.FC = () => {
     }
   };
 
-  // Handle edit project navigation
   const handleEditProject = () => {
     navigate(`/manager/projects/${id}/edit`)
   }
 
 
   const handleDeleteProject = async () => {
-    // Show confirmation dialog
     const confirmDelete = window.confirm("Are you sure you want to delete this project? This action cannot be undone.");
     
     if (!confirmDelete) {
-      return; // User canceled the deletion
+      return; 
     }
     
     try {
@@ -197,7 +188,7 @@ const ViewProject: React.FC = () => {
         return;
       }
       
-      // Call the delete API endpoint
+     
       const response = await axiosInstance.delete(`/project/getallprojects/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -206,7 +197,6 @@ const ViewProject: React.FC = () => {
       
       if (response.data.success) {
         toast.success("Project deleted successfully");
-        // Navigate back to the projects list
         navigate("/manager/projects");
       } else {
         toast.error(response.data.message || "Failed to delete project");
@@ -217,7 +207,6 @@ const ViewProject: React.FC = () => {
     }
   };
 
-  // Get status badge color
   const getStatusColor = (status: string) => {
     switch (status) {
       case "planned":
@@ -233,7 +222,6 @@ const ViewProject: React.FC = () => {
     }
   }
 
-  // Format status for display
   const formatStatus = (status: string) => {
     return status
       .split("-")
@@ -243,10 +231,9 @@ const ViewProject: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-[#0f121b]">
-      {/* Sidebar */}
+    
       <Sidebar />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
 
@@ -257,7 +244,6 @@ const ViewProject: React.FC = () => {
             </div>
           ) : project ? (
             <div className="max-w-6xl mx-auto">
-              {/* Project Header */}
               <div className="bg-gradient-to-r from-blue-900 to-indigo-900 rounded-t-lg shadow-lg p-6">
                 <div className="flex justify-between items-start">
                   <div>
@@ -319,10 +305,8 @@ const ViewProject: React.FC = () => {
                 </div>
               </div>
 
-              {/* Project Details */}
               <div className="bg-gray-900 p-6 shadow-lg rounded-b-lg mb-6">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                  {/* Left Column - Description and Goal */}
                   <div className="lg:col-span-2 space-y-6">
                     <div>
                       <h2 className="text-lg font-semibold text-white mb-3 flex items-center">
@@ -343,7 +327,6 @@ const ViewProject: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Right Column - Project Manager and Timeline */}
                   <div className="space-y-6">
                     <div className="bg-gray-800 p-4 rounded-md">
                       <h2 className="text-lg font-semibold text-white mb-3 flex items-center">
@@ -392,7 +375,6 @@ const ViewProject: React.FC = () => {
                 </div>
               </div>
 
-              {/* Comments Section */}
               <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-900 to-indigo-900 px-6 py-4">
                   <h2 className="text-lg font-semibold text-white flex items-center">
@@ -402,7 +384,6 @@ const ViewProject: React.FC = () => {
                 </div>
 
                 <div className="p-6">
-                  {/* Comment List */}
                   <div className="space-y-4 mb-6">
                     {project.comments && project.comments.length > 0 ? (
                       project.comments.map((comment) => (

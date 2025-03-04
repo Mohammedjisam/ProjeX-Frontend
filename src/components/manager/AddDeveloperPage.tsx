@@ -9,14 +9,13 @@ const AddDeveloperPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSuccess = () => {
-    // Redirect to dashboard or managers list after successful submission
     navigate('/manager/developers');
   };
 
   return (
     <div className="flex min-h-screen bg-[#0A101F] text-white overflow-hidden">
       <Sidebar />
-      <div className="flex-1 flex flex-col overflow-hidden ml-[240px]">
+      <div className="flex-1 flex flex-col overflow-hidden ">
         <Header />
         <main className="flex-1 overflow-y-auto p-8">
           <div className="max-w-md mx-auto mt-10">

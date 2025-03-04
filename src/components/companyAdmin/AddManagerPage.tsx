@@ -9,7 +9,6 @@ const AddManagerPage: React.FC = () => {
   const navigate = useNavigate();
 
   const handleSuccess = () => {
-    // Redirect to dashboard or managers list after successful submission
     navigate('/companyadmin/managers');
   };
 

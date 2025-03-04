@@ -1,27 +1,30 @@
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup"
-import axios from "axios"
-import { useNavigate } from "react-router-dom"
-import { Button } from "../../components/ui/button"
-import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
-import { Separator } from "../../components/ui/separator"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
-import { AlertCircle, Mail, Lock, User, Phone, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react'
-import OTPModal from '../../components/OTPModal'
-import { GoogleLogin } from '@react-oauth/google'
+"use client";
+
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
+import { Separator } from "../../components/ui/separator";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card";
+import { AlertCircle, Mail, Lock, User, Phone, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
+import OTPModal from '../../components/OTPModal';
+import { GoogleLogin } from '@react-oauth/google';
+import axiosInstance from "../../utils/AxiosConfig";
 
 interface SignupFormInputs {
-  name: string
-  email: string
-  phoneNumber: string
-  password: string
-  confirmPassword: string
+  name: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+  confirmPassword: string;
 }
 
-const signupSchema = yup.object({
+const signupSchema = yup.object().shape({
   name: yup.string().required("Name is required"),
   email: yup.string().email("Invalid email").required("Email is required"),
   phoneNumber: yup
@@ -33,16 +36,16 @@ const signupSchema = yup.object({
     .string()
     .oneOf([yup.ref("password")], "Passwords must match")
     .required("Confirm password is required"),
-})
+});
 
 const DeveloperSignup = () => {
-  const [isOTPModalOpen, setIsOTPModalOpen] = useState(false)
-  const [tempEmail, setTempEmail] = useState('')
-  const navigate = useNavigate()
-  const [error, setError] = useState<string>("")
-  const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [loading, setLoading] = useState(false)
-  const [otpError, setOtpError] = useState<string>("")
+  const [isOTPModalOpen, setIsOTPModalOpen] = useState(false);
+  const [tempEmail, setTempEmail] = useState('');
+  const navigate = useNavigate();
+  const [error, setError] = useState<string>("");
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
+  const [otpError, setOtpError] = useState<string>("");
   
   const {
     register,
@@ -50,99 +53,116 @@ const DeveloperSignup = () => {
     formState: { errors, isSubmitting },
   } = useForm<SignupFormInputs>({
     resolver: yupResolver(signupSchema),
-  })
+  });
 
   const onSubmit = async (data: SignupFormInputs) => {
     try {
-      setError('')
+      setError('');
       
-      const response = await axios.post('http://localhost:5000/api/auth/signup/initiate', {
+      const response = await axiosInstance.post('/auth/signup/initiate', {
         name: data.name,
         email: data.email,
         phoneNumber: data.phoneNumber,
         password: data.password,
         role: 'developer' 
-      })
+      });
 
       if (response.data.success) {
-        setTempEmail(data.email)
-        setIsOTPModalOpen(true)
+        toast.success("Verification code sent! Please check your email.");
+        setTempEmail(data.email);
+        setIsOTPModalOpen(true);
       }
     } catch (error: any) {
-      setError(error.response?.data?.message || 'An error occurred during signup')
+      const errorMessage = error.response?.data?.message || 'An error occurred during signup';
+      toast.error(errorMessage);
+      setError(errorMessage);
     }
-  }
+  };
 
   const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword)
-  }
+    setShowPassword(!showPassword);
+  };
 
   const handleGoogleLoginSuccess = async (credentialResponse: any) => {
     try {
-      setLoading(true)
-      setError('')
+      setLoading(true);
+      setError('');
       
-      const response = await axios.post('http://localhost:5000/api/auth/google/token', {
+      const response = await axiosInstance.post('/auth/google/token', {
         credential: credentialResponse.credential,
         role: 'developer'
-      })
+      });
   
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem("developerData", JSON.stringify(response.data.user))
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem("developerData", JSON.stringify(response.data.user));
       
-      navigate('/developer/dashboard')
+      toast.success("Google signup successful! Redirecting to dashboard...");
+      navigate('/developer/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Google authentication failed')
+      const errorMessage = err.response?.data?.message || 'Google authentication failed';
+      toast.error(errorMessage);
+      setError(errorMessage);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleGoogleLoginError = () => {
-    setError('Google login failed. Please try again.')
-  }
+    const errorMessage = 'Google login failed. Please try again.';
+    toast.error(errorMessage);
+    setError(errorMessage);
+  };
 
   const handleOTPVerification = async (otp: string) => {
     try {
-      setOtpError("")
-      const response = await axios.post('http://localhost:5000/api/auth/signup/verify', {
+      setOtpError("");
+      const response = await axiosInstance.post('/auth/signup/verify', {
         email: tempEmail,
         otp,
         role: 'developer'
-      })
+      });
   
       if (response.data.success) {
-        localStorage.setItem('token', response.data.token)
-        localStorage.setItem("developerData", JSON.stringify(response.data.user))
-        navigate('/developer/dashboard')
-        return true
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem("developerData", JSON.stringify(response.data.user));
+        toast.success("Account verified successfully! Redirecting to dashboard...");
+        navigate('/developer/dashboard');
+        return true;
       }
     } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Invalid OTP. Please try again.';
+      toast.error(errorMessage);
       if (error.response) {
-        setOtpError(error.response.data.message || 'Invalid OTP. Please try again.')
+        setOtpError(error.response.data.message || 'Invalid OTP. Please try again.');
       } else if (error.request) {
-        setOtpError('No response from server. Please check your connection.')
+        setOtpError('No response from server. Please check your connection.');
       } else {
-        setOtpError('Error verifying OTP. Please try again later.')
+        setOtpError('Error verifying OTP. Please try again later.');
       }
-      return false
+      return false;
     }
-    return true
-  }
+    return true;
+  };
 
   const handleResendOTP = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/signup/resend', {
+      const response = await axiosInstance.post('/auth/signup/resend', {
         email: tempEmail,
         role: 'developer'
-      })
+      });
       
-      return response.data.success
-    } catch (error) {
-      setOtpError('Failed to resend OTP. Please try again.')
-      return false
+      if (response.data.success) {
+        toast.success("New verification code sent! Please check your email.");
+        return true;
+      }
+      return response.data.success;
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to resend OTP. Please try again.';
+      toast.error(errorMessage);
+      setOtpError('Failed to resend OTP. Please try again.');
+      return false;
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
@@ -332,7 +352,7 @@ const DeveloperSignup = () => {
         error={otpError}
       />
     </div>
-  )
-}
+  );
+};
 
-export default DeveloperSignup
+export default DeveloperSignup;

@@ -95,7 +95,7 @@ const SetPasswordPage: React.FC = () => {
     );
   }
   if (!isTokenValid) {
-    return null; // Navigate happens in useEffect
+    return null; 
   }
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">

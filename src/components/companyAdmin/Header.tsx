@@ -8,8 +8,8 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({
-  userAvatar = "https://ui-avatars.com/api/?name=Thomas&background=0D8ABC&color=fff",
-  userName = "Thomas"
+  userAvatar = "https://ui-avatars.com/api/?name=Jisam&background=0D8ABC&color=fff",
+  userName = "Jisam"
 }) => {
   return (
     <header className="flex justify-end items-center h-16 px-6 bg-sidebar-bg/50 border-b border-white/5">

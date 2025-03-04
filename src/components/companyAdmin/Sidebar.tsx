@@ -42,7 +42,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 
 const Sidebar: React.FC = () => {
   return (
-    <aside className="w-[220px] bg-gray-800 h-screen flex flex-col fixed left-0 top-0 z-20 overflow-y-auto">
+    <aside className="w-[220px] bg-gray-900 h-screen flex flex-col fixed left-0 top-0 z-20 overflow-y-auto">
       <div className="p-6">
         <h1 className="text-xl font-bold text-white">ProjeX</h1>
       </div>

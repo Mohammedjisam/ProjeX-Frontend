@@ -7,7 +7,7 @@ const OverallProgress: React.FC = () => {
     const timer = setTimeout(() => {
       if (progressRef.current) {
         progressRef.current.style.transition = 'stroke-dashoffset 1.5s ease-in-out';
-        progressRef.current.style.strokeDashoffset = '125'; // Around 50% completion
+        progressRef.current.style.strokeDashoffset = '200'; // Around 50% completion
       }
     }, 500);
     

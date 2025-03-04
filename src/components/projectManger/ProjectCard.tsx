@@ -20,7 +20,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       if (circleRef.current) {
-        const circumference = 251.2; // 2 * PI * radius (40)
+        const circumference = 251.2; 
         const offset = circumference - (progress / 100) * circumference;
         circleRef.current.style.setProperty('--progress-value', String(offset));
         circleRef.current.style.strokeDashoffset = String(offset);

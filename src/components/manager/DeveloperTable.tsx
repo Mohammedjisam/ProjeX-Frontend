@@ -62,7 +62,6 @@ const DevelopersTable: React.FC = () => {
 
   const handleBlock = (id: string) => {
     toast.info(`Blocking developer with ID: ${id}`);
-    // Implementation for blocking a developer would go here
   };
 
   const handleDelete = async (id: string) => {

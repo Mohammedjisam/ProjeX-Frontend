@@ -5,7 +5,6 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { yupResolver } from "@hookform/resolvers/yup"
 import * as yup from "yup"
-import axios from "axios"
 import { useNavigate } from "react-router-dom"
 import { Button } from "../../components/ui/button"
 import { Input } from "../../components/ui/input"
@@ -15,6 +14,8 @@ import { AlertCircle, Mail, Lock, Eye, EyeOff } from "lucide-react"
 import { Alert, AlertDescription } from "../../components/ui/alert"
 import { Separator } from "../../components/ui/separator"
 import { GoogleLogin } from "@react-oauth/google"
+import { toast } from "sonner";
+import axiosInstance from "../../utils/AxiosConfig"
 
 interface LoginFormInputs {
   email: string
@@ -44,12 +45,12 @@ const ProjectManagerLogin: React.FC = () => {
     try {
       setError("")
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+      const response = await axiosInstance.post(
+        "/auth/login",
         {
           email: data.email,
           password: data.password,
-          role: "projectManager", // Add role parameter
+          role: "projectManager",
         },
         {
           headers: {
@@ -59,18 +60,27 @@ const ProjectManagerLogin: React.FC = () => {
       )
 
       if (response.data.success) {
-        // Store token and user data
+        toast.success("Login successful!", {
+          style: { backgroundColor: "#34D399", color: "white" },
+        });
+        
         localStorage.setItem("token", response.data.token)
         localStorage.setItem("projectManagerData", JSON.stringify(response.data.user))
 
-        // Redirect to developer dashboard
         navigate("/projectmanager/dashboard")
       }
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || "An error occurred during login"
       setError(errorMessage)
+      
+      toast.error(errorMessage, {
+        style: { backgroundColor: "#EF4444", color: "white" },
+      });
+    } finally {
+      setLoading(false);
     }
   }
+
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword)
@@ -83,23 +93,29 @@ const ProjectManagerLogin: React.FC = () => {
 
       console.log("Google login response:", credentialResponse)
 
-      // Send the credential token to your backend with the role
-      const response = await axios.post("http://localhost:5000/api/auth/google/token", {
+      const response = await axiosInstance.post("/auth/google/token", {
         credential: credentialResponse.credential,
-        role: "projectManager", // Hardcode the role to match the component purpose
+        role: "projectManager",
       })
 
       console.log("Google authentication successful:", response.data)
 
-      // Save token and user data
+      toast.success("Google authentication successful!", {
+        style: { backgroundColor: "#34D399", color: "white" },
+      });
+
       localStorage.setItem("token", response.data.token)
       localStorage.setItem("projectManagerData", JSON.stringify(response.data.user))
 
-      // Redirect to appropriate dashboard
       navigate("/projectmanager/dashboard")
     } catch (err: any) {
       console.error("Google login error:", err)
-      setError(err.response?.data?.message || "Google authentication failed")
+      const errorMessage = err.response?.data?.message || "Google authentication failed";
+      setError(errorMessage)
+      
+      toast.error(errorMessage, {
+        style: { backgroundColor: "#EF4444", color: "white" },
+      });
     } finally {
       setLoading(false)
     }
@@ -110,7 +126,7 @@ const ProjectManagerLogin: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-9050 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>

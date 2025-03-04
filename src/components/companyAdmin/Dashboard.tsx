@@ -38,7 +38,6 @@ const Dashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Simulate loading delay for animation purposes
     const timer = setTimeout(() => {
       setLoaded(true);
     }, 100);
@@ -58,7 +57,6 @@ const Dashboard: React.FC = () => {
       const response = await axiosInstance.get('/companyadmin/getallmanager');
 
       if (response.data && response.data.data) {
-        // Transform the data to match our component's expected format
         const transformedManagers = response.data.data.map((manager: any) => ({
           _id: manager._id,
           name: manager.name,
@@ -66,7 +64,7 @@ const Dashboard: React.FC = () => {
           phoneNumber: manager.phoneNumber || 'N/A',
           avatar: `/placeholder.svg?height=60&width=60`,
           location: manager.location || 'Unknown',
-          projectCount: '0/0', // Default value since we don't have this in the API
+          projectCount: '0/0',
           isHighlighted: false
         }));
         
@@ -92,7 +90,6 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  // Projects data (still hardcoded for now, you can update this similarly)
   const projects: Project[] = [
     {
       id: 1,
@@ -190,7 +187,7 @@ const Dashboard: React.FC = () => {
                 projectCount: manager.projectCount || "0/0",
                 phone: manager.phoneNumber,
                 location: manager.location || "Unknown",
-                isHighlighted: index === 0 // Highlight the first one
+                isHighlighted: index === 0 
               }} 
               delay={index} 
             />

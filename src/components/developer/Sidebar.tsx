@@ -85,12 +85,12 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onToggle }) => {
       <div className="p-4 border-t border-gray-800">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full bg-[#1e293b] flex items-center justify-center">
-            <span className="text-white font-medium">R</span>
+            <span className="text-white font-medium">P</span>
           </div>
           {!collapsed && (
             <div className="flex flex-col">
-              <span className="text-white font-medium">Ram</span>
-              <span className="text-xs text-gray-400">ram@projex.com</span>
+              <span className="text-white font-medium">Peter</span>
+              <span className="text-xs text-gray-400">peter@gmail.com.com</span>
             </div>
           )}
           {!collapsed && (

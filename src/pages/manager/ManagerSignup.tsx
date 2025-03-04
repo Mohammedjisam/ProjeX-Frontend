@@ -5,7 +5,6 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -31,6 +30,8 @@ import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Separator } from "../../components/ui/separator";
 import OTPModal from "../../components/OTPModal";
 import { GoogleLogin } from "@react-oauth/google";
+import axiosInstance from "../../utils/AxiosConfig";
+import { toast } from "sonner";
 
 interface SignupFormInputs {
   name: string;
@@ -78,28 +79,33 @@ const ManagerSignup: React.FC = () => {
     try {
       setError("");
 
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/signup/initiate",
+      const response = await axiosInstance.post(
+        "/auth/signup/initiate",
         {
           name: data.name,
           email: data.email,
           phoneNumber: data.phoneNumber,
           password: data.password,
-          role: "manager", // Set role as manager
+          role: "manager",
         }
       );
 
       if (response.data.success) {
+        toast.success("Verification code sent to your email!", {
+          style: { backgroundColor: "#34D399", color: "white" },
+        });
         setTempEmail(data.email);
         setIsOTPModalOpen(true);
       }
-    } catch (error) {
-      setError(
-        error.response?.data?.message || "An error occurred during signup"
-      );
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || "An error occurred during signup";
+      setError(errorMessage);
+      
+      toast.error(errorMessage, {
+        style: { backgroundColor: "#EF4444", color: "white" },
+      });
     }
   };
-
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
@@ -111,63 +117,81 @@ const ManagerSignup: React.FC = () => {
 
       console.log("Google login response:", credentialResponse);
 
-      // Send the credential token to your backend with the role
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/google/token",
+      const response = await axiosInstance.post(
+        "/auth/google/token",
         {
           credential: credentialResponse.credential,
-          role: "manager", // Hardcode the role to match the component purpose
+          role: "manager", 
         }
       );
 
       console.log("Google authentication successful:", response.data);
 
-      // Save token and user data
+      toast.success("Google authentication successful!", {
+        style: { backgroundColor: "#34D399", color: "white" },
+      });
+
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("managerData", JSON.stringify(response.data.user));
 
-      // Redirect to appropriate dashboard
       navigate("/manager/dashboard");
     } catch (err: any) {
       console.error("Google login error:", err);
       setError(err.response?.data?.message || "Google authentication failed");
+      toast.error(err.response?.data?.message, {
+        style: { backgroundColor: "#EF4444", color: "white" },
+      });
     } finally {
       setLoading(false);
     }
   };
 
   const handleGoogleLoginError = () => {
-    setError("Google login failed. Please try again.");
+    const errorMessage = "Google login failed. Please try again.";
+    setError(errorMessage);
+    toast.error(errorMessage, {
+      style: { backgroundColor: "#EF4444", color: "white" },
+    });
   };
 
   const handleOTPVerification = async (otp: string) => {
     try {
-      setOtpError(""); // Clear previous OTP errors
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/signup/verify",
+      setOtpError(""); 
+      const response = await axiosInstance.post(
+        "/auth/signup/verify",
         {
           email: tempEmail,
           otp,
-          role: "manager", // Make sure role is passed in verification
+          role: "manager",
         }
       );
 
       if (response.data.success) {
+        toast.success("Account verified successfully!", {
+          style: { backgroundColor: "#34D399", color: "white" },
+        });
+        
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("managerData", JSON.stringify(response.data.user))
-        navigate("/manager/dashboard"); // Navigate to manager dashboard
+        navigate("/manager/dashboard"); 
         return true;
       }
-    } catch (error) {
+    }catch (error: any) {
+      let errorMessage = "";
       if (error.response) {
-        setOtpError(
-          error.response.data.message || "Invalid OTP. Please try again."
-        );
+        errorMessage = error.response.data.message || "Invalid OTP. Please try again.";
       } else if (error.request) {
-        setOtpError("No response from server. Please check your connection.");
+        errorMessage = "No response from server. Please check your connection.";
       } else {
-        setOtpError("Error verifying OTP. Please try again later.");
+        errorMessage = "Error verifying OTP. Please try again later.";
       }
+      
+      setOtpError(errorMessage);
+      
+      toast.error(errorMessage, {
+        style: { backgroundColor: "#EF4444", color: "white" },
+      });
+      
       return false;
     }
     return true;
@@ -175,23 +199,34 @@ const ManagerSignup: React.FC = () => {
 
   const handleResendOTP = async () => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/signup/resend",
+      const response = await axiosInstance.post("/auth/signup/resend",
         {
           email: tempEmail,
           role: "manager",
         }
       );
 
+      if (response.data.success) {
+        toast.success("OTP resent successfully!", {
+          style: { backgroundColor: "#34D399", color: "white" },
+        });
+      }
+      
       return response.data.success;
-    } catch (error) {
-      setOtpError("Failed to resend OTP. Please try again.");
+    } catch (error: any) {
+      const errorMessage = "Failed to resend OTP. Please try again.";
+      setOtpError(errorMessage);
+      
+      toast.error(errorMessage, {
+        style: { backgroundColor: "#EF4444", color: "white" },
+      });
+      
       return false;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+    <div className="min-h-screen bg-gray-9000 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">

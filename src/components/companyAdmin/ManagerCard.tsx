@@ -44,7 +44,6 @@ const ManagerCard: React.FC<ManagerCardProps> = ({ manager, delay = 0 }) => {
           </div>
           <div>
             <h3 className="text-lg font-medium text-white">{manager.name}</h3>
-            {/* <p className="text-xs text-gray-400">{manager.location}</p> */}
           </div>
         </motion.div>
         

@@ -56,7 +56,6 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
     const { name, value } = e.target
     setFormData({ ...formData, [name]: value })
 
-    // Clear error message when user types
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" })
     }
@@ -72,21 +71,17 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
     setLoading(true)
 
     try {
-      // Create manager without password - password setup email will be sent
-      // Fix the API endpoint to match the backend route
       const response = await axiosInstance.post("/companyadmin/addnewmanager", formData)
 
       if (response.data.success) {
         toast.success("Manager added successfully. Password setup email sent.")
 
-        // Reset form
         setFormData({
           name: "",
           email: "",
           phoneNumber: "",
         })
 
-        // Call success callback if provided
         if (onSuccess) {
           onSuccess()
         }
@@ -97,8 +92,7 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
       let errorMessage = "Failed to add manager"
 
       if (axios.isAxiosError(err)) {
-        // Add more detailed error logging
-        console.error("Axios error details:", {
+          console.error("Axios error details:", {
           status: err.response?.status,
           data: err.response?.data,
           headers: err.response?.headers,
