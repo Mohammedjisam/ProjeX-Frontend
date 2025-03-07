@@ -25,12 +25,20 @@ const companyAdminSlice = createSlice({
       state.companyAdminData = action.payload;
       localStorage.setItem("companyAdminData", JSON.stringify(action.payload));
     },
+    updateCompanyAdmin: (state, action: PayloadAction<any>) => {
+      state.companyAdminData = {
+        ...state.companyAdminData,
+        ...action.payload
+      };
+      localStorage.setItem("companyAdminData", JSON.stringify(state.companyAdminData));
+    },
     logoutCompanyAdmin: (state) => {
       state.companyAdminData = null;
       localStorage.removeItem("companyAdminData");
+      localStorage.removeItem("token");
     },
   },
 });
 
-export const { addCompanyAdmin, logoutCompanyAdmin } = companyAdminSlice.actions;
+export const { addCompanyAdmin,updateCompanyAdmin, logoutCompanyAdmin } = companyAdminSlice.actions;
 export default companyAdminSlice.reducer;

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import axios from 'axios';
 import axiosInstance from '../../utils/AxiosConfig';
-import Header from './Header';
 import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
 
@@ -168,7 +167,6 @@ const ManagersTable: React.FC = () => {
     <div className="flex h-screen bg-gray-900">
       <Sidebar />
       <div className="flex-1 ml-[220px]">
-        <Header userAvatar="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" userName="Admin" />
         <main className="p-6">
           {renderContent()}
         </main>

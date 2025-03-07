@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Separator } from "../../components/ui/separator";
-import OTPModal from "../../components/OTPModal";
+import OTPModal from "../../components/shared/OTPModal";
 import { GoogleLogin } from "@react-oauth/google";
 import axiosInstance from "../../utils/AxiosConfig";
 import { toast } from "sonner";

@@ -6,7 +6,6 @@ import axios from 'axios';
 import axiosInstance from '../../utils/AxiosConfig';
 import ProjectCard from './ProjectCard';
 import ManagerCard from './ManagerCard';
-import Header from './Header';
 import Sidebar from './Sidebar';
 
 interface Project {
@@ -201,7 +200,6 @@ const Dashboard: React.FC = () => {
     <div className="flex min-h-screen bg-[#0A101F] text-white overflow-hidden">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden ml-[240px]">
-        <Header />
         <main className="flex-1 overflow-y-auto p-8">
           <motion.div
             initial={{ opacity: 0 }}

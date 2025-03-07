@@ -6,6 +6,8 @@ import ProtectedCompanyAdminLogin from '../private/companyAdmin/ProtectedCompany
 import ProtectedCompanyAdminRoutes from '../private/companyAdmin/ProtectedCompanyAdminRoute';
 import ManagersTable from '../components/companyAdmin/ManagersTable';
 import AddManagerPage from '../components/companyAdmin/AddManagerPage';
+import FirstPage from '../pages/companyAdmin/FirstPage';
+import Profile from '../components/companyAdmin/Profile';
 
 
 function CompanyAdminRoutes() {
@@ -17,6 +19,8 @@ function CompanyAdminRoutes() {
       <Route path='dashboard' element={<ProtectedCompanyAdminRoutes><Dashboard/></ProtectedCompanyAdminRoutes>}/>
       <Route path='managers' element={<ProtectedCompanyAdminRoutes><ManagersTable/></ProtectedCompanyAdminRoutes>}/>
       <Route path='addmanager' element={<ProtectedCompanyAdminRoutes><AddManagerPage/></ProtectedCompanyAdminRoutes>}/>
+      <Route path='landing' element={<ProtectedCompanyAdminRoutes><FirstPage/></ProtectedCompanyAdminRoutes>}/>
+      <Route path='profile' element={<ProtectedCompanyAdminRoutes><Profile/></ProtectedCompanyAdminRoutes>}/>
       </Routes>
     </div>
   )

@@ -12,7 +12,7 @@ import { Label } from "../../components/ui/label";
 import { Separator } from "../../components/ui/separator";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card";
 import { AlertCircle, Mail, Lock, User, Phone, Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
-import OTPModal from '../../components/OTPModal';
+import OTPModal from '../../components/shared/OTPModal';
 import { GoogleLogin } from '@react-oauth/google';
 import axiosInstance from "../../utils/AxiosConfig";
 

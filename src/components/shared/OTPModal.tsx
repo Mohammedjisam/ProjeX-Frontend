@@ -2,10 +2,10 @@
 
 import type * as React from "react"
 import { useState, useEffect, useRef } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../components/ui/dialog"
-import { Button } from "../components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
+import { Button } from "../ui/button"
 import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
-import { Input } from "../components/ui/input"
+import { Input } from "../ui/input"
 
 interface OTPModalProps {
   isOpen: boolean
