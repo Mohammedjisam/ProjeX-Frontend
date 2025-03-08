@@ -1,9 +1,14 @@
 import type React from "react"
-import { Home, Users, FolderKanban, MessageSquare, Calendar, Settings } from "lucide-react"
+import { Home, Users, FolderKanban, MessageSquare, Calendar, Settings, UserCircle } from "lucide-react"
 import { cn } from "../../lib/utils"
 import { useNavigate } from "react-router-dom"
+import { useSelector } from "react-redux"
+import { RootState } from "../../redux/Store"
 
 export default function Sidebar() {
+  const managerData = useSelector((state: RootState) => state.manager.managerData)
+  const currentPath = window.location.pathname
+
   return (
     <aside className="w-52 bg-gray-900 flex flex-col h-screen border-r border-gray-800 shadow-xl">
       <div className="p-4 border-b border-gray-800">
@@ -12,7 +17,11 @@ export default function Sidebar() {
 
       <nav className="flex-1 py-4 space-y-1 overflow-hidden">
         {navItems.map((item) => (
-          <NavItem key={item.label} {...item} active={item.label === "Dashboard"} />
+          <NavItem 
+            key={item.label} 
+            {...item} 
+            active={currentPath === item.path} 
+          />
         ))}
       </nav>
 
@@ -55,12 +64,12 @@ function NavItem({ icon: Icon, label, path, active }: NavItemProps) {
 }
 
 const navItems = [
-  { icon: Home, label: "Dashboard", path: "/manager/dashboar" },
+  { icon: Home, label: "Dashboard", path: "/manager/dashboard" },
   { icon: Users, label: "Developers", path: "/manager/developers" },
   { icon: FolderKanban, label: "Project Managers", path: "/manager/projectmanagers" },
   { icon: FolderKanban, label: "Projects", path: "/manager/projects" },
   { icon: MessageSquare, label: "Chats", path: "/manager/chats" },
   { icon: Calendar, label: "Meetings", path: "/manager/meetings" },
+  { icon: UserCircle, label: "Profile", path: "/manager/profile" },
   { icon: Settings, label: "Settings", path: "/manager/settings" },
 ]
-

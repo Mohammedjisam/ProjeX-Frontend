@@ -13,6 +13,7 @@ import ProjectsTable from '../components/manager/ProjectTable';
 import AddNewProject from '../components/manager/AddProject';
 import ViewProject from '../components/manager/ViewProject';
 import EditProject from '../components/manager/EditProject';
+import Profile from '../components/manager/Profile';
 
 function ManagerRoutes() {
   return (
@@ -30,6 +31,7 @@ function ManagerRoutes() {
         <Route path='addproject' element={<ProtectedManagerRoutes><AddNewProject/></ProtectedManagerRoutes>}/>
         <Route path="projects/:id" element={<ProtectedManagerRoutes><ViewProject/></ProtectedManagerRoutes>}/>
         <Route path="projects/:id/edit" element={<ProtectedManagerRoutes><EditProject/></ProtectedManagerRoutes>}/>
+        <Route path="profile" element={<ProtectedManagerRoutes><Profile/></ProtectedManagerRoutes>}/>
         
       </Routes>
     </div>

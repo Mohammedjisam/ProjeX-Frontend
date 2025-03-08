@@ -25,6 +25,13 @@ const projectManagerSlice = createSlice({
       state.projectManagerData = action.payload;
       localStorage.setItem("projectManagerData", JSON.stringify(action.payload));
     },
+    updateProjectManager: (state, action: PayloadAction<any>) => {
+      state.projectManagerData = {
+        ...state.projectManagerData,
+        ...action.payload
+      };
+      localStorage.setItem("projectManagerData", JSON.stringify(state.projectManagerData));
+    },
     logoutProjectManager: (state) => {
       state.projectManagerData = null;
       localStorage.removeItem("projectManagerData");
@@ -32,5 +39,5 @@ const projectManagerSlice = createSlice({
   },
 });
 
-export const { addProjectManager, logoutProjectManager } = projectManagerSlice.actions;
+export const { addProjectManager, updateProjectManager, logoutProjectManager } = projectManagerSlice.actions;
 export default projectManagerSlice.reducer;

@@ -25,6 +25,13 @@ const developerSlice = createSlice({
       state.developerData = action.payload;
       localStorage.setItem("developerData", JSON.stringify(action.payload));
     },
+    updateDeveloper: (state, action: PayloadAction<any>) => {
+      state.developerData = {
+        ...state.developerData,
+        ...action.payload
+      };
+      localStorage.setItem("developerData", JSON.stringify(state.developerData));
+    },
     logoutDeveloper: (state) => {
       state.developerData = null;
       localStorage.removeItem("developerData");
@@ -32,5 +39,5 @@ const developerSlice = createSlice({
   },
 });
 
-export const { addDeveloper, logoutDeveloper } = developerSlice.actions;
+export const { addDeveloper,updateDeveloper, logoutDeveloper } = developerSlice.actions;
 export default developerSlice.reducer;

@@ -1,10 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../redux/Store';
-import { Edit, Save } from 'lucide-react';
-import Sidebar from '../../components/companyAdmin/Sidebar';
+import { Edit, Save, Upload, User, Phone, Mail, Loader2 } from 'lucide-react';
+import Sidebar from './Sidebar';
 import { updateCompanyAdmin } from '../../redux/slice/CompanyAdminSlice';
 import axiosInstance from '../../utils/AxiosConfig';
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Alert, AlertDescription } from "../ui/alert";
+import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
+import { Separator } from "../ui/separator";
 
 const Profile: React.FC = () => {
   const dispatch = useDispatch();
@@ -74,7 +81,7 @@ const Profile: React.FC = () => {
         profileImageBase64: profileImageBase64
       };
 
-      // Make API call to update profile - using the correct endpoint
+      // Make API call to update profile
       const response = await axiosInstance.put('/auth/profile', updateData);
       
       // Update Redux state with new user data
@@ -101,137 +108,176 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900">
+    <div className="flex min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
       <Sidebar />
       
       <div className="flex-1 ml-[240px] p-6">
-        <div className="p-6 bg-gray-800 rounded-lg max-w-2xl mx-auto mt-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-white">Profile</h2>
-            <button 
-              onClick={() => isEditing ? handleSubmit({ preventDefault: () => {} } as React.FormEvent) : setIsEditing(true)}
-              disabled={isLoading}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-            >
-              {isLoading ? (
-                <span>Processing...</span>
-              ) : isEditing ? (
-                <>
-                  <Save size={18} />
-                  <span>Save</span>
-                </>
-              ) : (
-                <>
-                  <Edit size={18} />
-                  <span>Edit</span>
-                </>
-              )}
-            </button>
-          </div>
-          
-          {error && (
-            <div className="mb-4 p-3 bg-red-900/50 border border-red-500 text-red-200 rounded-md">
-              {error}
-            </div>
-          )}
-          
-          {successMessage && (
-            <div className="mb-4 p-3 bg-green-900/50 border border-green-500 text-green-200 rounded-md">
-              {successMessage}
-            </div>
-          )}
-          
-          <div className="flex flex-col md:flex-row gap-8 items-center md:items-start">
-            <div className="flex flex-col items-center">
-              <div className="w-32 h-32 rounded-full bg-gray-700 overflow-hidden mb-3 flex items-center justify-center">
-                {previewImage ? (
-                  <img 
-                    src={previewImage} 
-                    alt="Profile Preview" 
-                    className="w-full h-full object-cover"
-                  /> 
-                ) : (
-                  <div className="w-full h-full bg-blue-600 flex items-center justify-center text-white text-3xl font-bold">
-                    {companyAdminData?.name ? companyAdminData.name.charAt(0).toUpperCase() : 'U'}
-                  </div>
-                )}
+        <div className="max-w-3xl mx-auto mt-8">
+          <Card className="border-slate-700 bg-slate-800/50 backdrop-blur-sm shadow-xl">
+            <CardHeader className="border-b border-slate-700 pb-4">
+              <div className="flex justify-between items-center">
+                <CardTitle className="text-2xl font-bold text-white">My Profile</CardTitle>
+                <Button 
+                  onClick={() => isEditing ? handleSubmit({ preventDefault: () => {} } as React.FormEvent) : setIsEditing(true)}
+                  disabled={isLoading}
+                  variant={isEditing ? "default" : "outline"}
+                  className={isEditing ? "bg-emerald-600 hover:bg-emerald-700" : "border-slate-600 text-slate-200"}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 size={18} className="mr-2 animate-spin" />
+                      <span>Processing...</span>
+                    </>
+                  ) : isEditing ? (
+                    <>
+                      <Save size={18} className="mr-2" />
+                      <span>Save Changes</span>
+                    </>
+                  ) : (
+                    <>
+                      <Edit size={18} className="mr-2" />
+                      <span>Edit Profile</span>
+                    </>
+                  )}
+                </Button>
               </div>
-              {isEditing && (
-                <label className="cursor-pointer text-blue-400 hover:text-blue-300 text-sm">
-                  Change Photo
-                  <input 
-                    type="file" 
-                    className="hidden" 
-                    accept="image/*"
-                    onChange={handleImageChange} 
-                  />
-                </label>
-              )}
-            </div>
+            </CardHeader>
             
-            <div className="flex-1 w-full">
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-gray-400 text-sm font-medium mb-1">Name</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      required
-                    />
-                  ) : (
-                    <p className="text-white">{companyAdminData?.name || 'Not provided'}</p>
+            <CardContent className="pt-6">
+              {error && (
+                <Alert variant="destructive" className="mb-6 bg-red-900/20 border-red-800 text-red-200">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+              
+              {successMessage && (
+                <Alert className="mb-6 bg-emerald-900/20 border-emerald-800 text-emerald-200">
+                  <AlertDescription>{successMessage}</AlertDescription>
+                </Alert>
+              )}
+              
+              <div className="flex flex-col md:flex-row gap-8">
+                <div className="flex flex-col items-center space-y-4">
+                  <Avatar className="w-32 h-32 border-4 border-slate-700 shadow-lg">
+                    {previewImage ? (
+                      <AvatarImage src={previewImage} alt="Profile" className="object-cover" />
+                    ) : (
+                      <AvatarFallback className="bg-gradient-to-br from-indigo-600 to-purple-700 text-3xl font-bold">
+                        {companyAdminData?.name ? companyAdminData.name.charAt(0).toUpperCase() : 'U'}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                  
+                  {isEditing && (
+                    <div className="w-full">
+                      <Label htmlFor="profile-image" className="cursor-pointer">
+                        <div className="flex items-center justify-center gap-2 py-2 px-4 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-md transition-colors text-sm">
+                          <Upload size={16} />
+                          <span>Upload Photo</span>
+                        </div>
+                        <Input 
+                          id="profile-image"
+                          type="file" 
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={handleImageChange} 
+                        />
+                      </Label>
+                    </div>
                   )}
                 </div>
                 
-                <div>
-                  <label className="block text-gray-400 text-sm font-medium mb-1">Email</label>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      required
-                    />
-                  ) : (
-                    <p className="text-white">{companyAdminData?.email || 'Not provided'}</p>
-                  )}
+                <div className="flex-1 space-y-6">
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-slate-300 flex items-center gap-2">
+                        <User size={16} className="text-slate-400" />
+                        <span>Full Name</span>
+                      </Label>
+                      {isEditing ? (
+                        <Input
+                          id="name"
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          className="bg-slate-700 border-slate-600 text-white focus-visible:ring-indigo-500"
+                          required
+                        />
+                      ) : (
+                        <div className="px-3 py-2 rounded-md bg-slate-700/50 border border-slate-600 text-white">
+                          {companyAdminData?.name || 'Not provided'}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-slate-300 flex items-center gap-2">
+                        <Mail size={16} className="text-slate-400" />
+                        <span>Email Address</span>
+                      </Label>
+                      {isEditing ? (
+                        <Input
+                          id="email"
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          className="bg-slate-700 border-slate-600 text-white focus-visible:ring-indigo-500"
+                          required
+                        />
+                      ) : (
+                        <div className="px-3 py-2 rounded-md bg-slate-700/50 border border-slate-600 text-white">
+                          {companyAdminData?.email || 'Not provided'}
+                        </div>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="phoneNumber" className="text-slate-300 flex items-center gap-2">
+                        <Phone size={16} className="text-slate-400" />
+                        <span>Phone Number</span>
+                      </Label>
+                      {isEditing ? (
+                        <Input
+                          id="phoneNumber"
+                          type="tel"
+                          name="phoneNumber"
+                          value={formData.phoneNumber}
+                          onChange={handleChange}
+                          className="bg-slate-700 border-slate-600 text-white focus-visible:ring-indigo-500"
+                        />
+                      ) : (
+                        <div className="px-3 py-2 rounded-md bg-slate-700/50 border border-slate-600 text-white">
+                          {companyAdminData?.phoneNumber || 'Not provided'}
+                        </div>
+                      )}
+                    </div>
+                    
+                    {isEditing && (
+                      <>
+                        <Separator className="my-4 bg-slate-700" />
+                        <Button
+                          type="submit"
+                          disabled={isLoading}
+                          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+                        >
+                          {isLoading ? (
+                            <>
+                              <Loader2 size={18} className="mr-2 animate-spin" />
+                              <span>Updating Profile...</span>
+                            </>
+                          ) : (
+                            'Save Profile Information'
+                          )}
+                        </Button>
+                      </>
+                    )}
+                  </form>
                 </div>
-                
-                <div>
-                  <label className="block text-gray-400 text-sm font-medium mb-1">Phone Number</label>
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      name="phoneNumber"
-                      value={formData.phoneNumber}
-                      onChange={handleChange}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  ) : (
-                    <p className="text-white">{companyAdminData?.phoneNumber || 'Not provided'}</p>
-                  )}
-                </div>
-                
-                {isEditing && (
-                  <div className="pt-4">
-                    <button
-                      type="submit"
-                      disabled={isLoading}
-                      className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-                    >
-                      {isLoading ? 'Updating...' : 'Update Profile'}
-                    </button>
-                  </div>
-                )}
-              </form>
-            </div>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

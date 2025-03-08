@@ -25,6 +25,13 @@ const managerSlice = createSlice({
       state.managerData = action.payload;
       localStorage.setItem("managerData", JSON.stringify(action.payload));
     },
+    updateManager: (state, action: PayloadAction<any>) => {
+      state.managerData = {
+        ...state.managerData,
+        ...action.payload
+      };
+      localStorage.setItem("managerData", JSON.stringify(state.managerData));
+    },
     logoutManager: (state) => {
       state.managerData = null;
       localStorage.removeItem("managerData");
@@ -32,5 +39,5 @@ const managerSlice = createSlice({
   },
 });
 
-export const { addManager, logoutManager } = managerSlice.actions;
+export const { addManager, updateManager,logoutManager } = managerSlice.actions;
 export default managerSlice.reducer;

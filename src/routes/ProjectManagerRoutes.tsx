@@ -5,6 +5,7 @@ import ProtectedProjectManagerLogin from '../private/projectManager/ProtectedPro
 import SetPasswordPage from '../components/projectManger/SetPasswordPage';
 import ProtectedProjectManagerRoutes from '../private/projectManager/ProtectedProjectManagerRoutes';
 import Dashboard from '../components/projectManger/Dashboard';
+import ProjectManagerProfile from '../components/projectManger/Profile';
 
 function ProjectManagerRoutes() {
   return (
@@ -14,6 +15,8 @@ function ProjectManagerRoutes() {
       <Route path='*' element={<ProtectedProjectManagerLogin><ProjectManagerLogin/></ProtectedProjectManagerLogin>}/>
       <Route path="set-password/:token" element={<SetPasswordPage />} />     
       <Route path='dashboard' element={<ProtectedProjectManagerRoutes><Dashboard/></ProtectedProjectManagerRoutes>}/>
+      <Route path='profile' element={<ProtectedProjectManagerRoutes><ProjectManagerProfile/></ProtectedProjectManagerRoutes>}/>
+
       </Routes>
     </div>
   )
