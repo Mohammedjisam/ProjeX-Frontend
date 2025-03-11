@@ -1,68 +1,91 @@
-
 import React from 'react';
 import { motion } from 'framer-motion';
 
-interface Manager {
-  id: number;
-  name: string;
-  avatar: string;
-  projectCount: string;
-  phone: string;
-  location: string;
-  isHighlighted?: boolean;
-}
-
 interface ManagerCardProps {
-  manager: Manager;
-  delay?: number;
+  manager: {
+    id: number;
+    name: string;
+    avatar: string;
+    projectCount: string;
+    phone: string;
+    location: string;
+    isHighlighted?: boolean;
+  };
+  delay: number;
 }
 
-const ManagerCard: React.FC<ManagerCardProps> = ({ manager, delay = 0 }) => {
+const ManagerCard: React.FC<ManagerCardProps> = ({ manager, delay }) => {
+  const { name, avatar, projectCount, phone, location, isHighlighted } = manager;
+
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: delay * 0.1 }}
-      className={`glassmorphism hover-scale rounded-xl overflow-hidden ${
-        manager.isHighlighted ? 'border border-indigo-500/50' : 'border border-white/10'
-      }`}
+      transition={{ duration: 0.4, delay: 0.05 * delay }}
+      className={`bg-white/5 backdrop-blur-md border ${
+        isHighlighted ? 'border-indigo-500/50' : 'border-white/10'
+      } rounded-xl p-6 hover:border-white/20 transition-all`}
     >
-      <div className="p-6">
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: delay * 0.1 + 0.2 }}
-          className="flex items-center mb-6"
-        >
-          <div className="w-14 h-14 rounded-full overflow-hidden mr-4 border-2 border-white/10">
-            <img 
-              src={manager.avatar} 
-              alt={manager.name} 
-              className="w-full h-full object-cover" 
-              loading="lazy"
-            />
-          </div>
-          <div>
-            <h3 className="text-lg font-medium text-white">{manager.name}</h3>
-          </div>
-        </motion.div>
-        
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: delay * 0.1 + 0.3 }}
-          className="flex justify-between items-center text-sm"
-        >
-          <div className="bg-white/5 rounded-lg p-3 w-full mr-2">
-            <p className="text-gray-400 mb-1 text-xs">Projects</p>
-            <p className="text-white font-medium">{manager.projectCount}</p>
-          </div>
-          <div className="bg-white/5 rounded-lg p-3 w-full">
-            <p className="text-gray-400 mb-1 text-xs">Phone</p>
-            <p className="text-white font-medium">{manager.phone}</p>
-          </div>
-        </motion.div>
+      <div className="flex items-center gap-4 mb-4">
+        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20">
+          <img src={avatar} alt={name} className="w-full h-full object-cover" />
+        </div>
+        <div>
+          <h3 className="text-lg font-semibold text-white">{name}</h3>
+          <p className="text-xs text-gray-400">{projectCount} Projects</p>
+        </div>
       </div>
+
+      <div className="space-y-3 mt-5">
+        <div className="flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+            />
+          </svg>
+          <span className="text-sm text-gray-300">{phone}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-4 w-4 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+            />
+          </svg>
+          <span className="text-sm text-gray-300">{location}</span>
+        </div>
+      </div>
+
+      <motion.button
+        whileHover={{ scale: 1.03 }}
+        whileTap={{ scale: 0.98 }}
+        className="w-full mt-6 py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-white transition-colors"
+      >
+        View Details
+      </motion.button>
     </motion.div>
   );
 };

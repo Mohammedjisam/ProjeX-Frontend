@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'sonner';
@@ -9,13 +8,16 @@ import ManagerCard from './ManagerCard';
 import Sidebar from './Sidebar';
 
 interface Project {
-  id: number;
-  title: string;
-  color: string;
-  user: {
+  _id: string;
+  name: string;
+  clientName: string;
+  status: string;
+  startDate: string;
+  endDate: string;
+  projectManager: {
+    _id: string;
     name: string;
-    avatar: string;
-    timeAgo: string;
+    email: string;
   };
 }
 
@@ -33,6 +35,7 @@ interface Manager {
 const Dashboard: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
   const [managers, setManagers] = useState<Manager[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,35 +48,83 @@ const Dashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchManagers();
+    fetchDashboardData();
   }, []);
 
-  const fetchManagers = async () => {
+  const fetchDashboardData = async () => {
     try {
       setLoading(true);
       setError(null);
       
-      const response = await axiosInstance.get('/companyadmin/getallmanager');
+      const response = await axiosInstance.get('/companyadmin/dashboard');
 
-      if (response.data && response.data.data) {
-        const transformedManagers = response.data.data.map((manager: any) => ({
-          _id: manager._id,
-          name: manager.name,
-          email: manager.email,
-          phoneNumber: manager.phoneNumber || 'N/A',
+      if (response.data && response.data.success) {
+        const dashboardData = response.data.data;
+        
+        // Process managers data
+        const transformedManagers = dashboardData.managers.map((manager: Manager, index: number) => ({
+          ...manager,
           avatar: `/placeholder.svg?height=60&width=60`,
-          location: manager.location || 'Unknown',
-          projectCount: '0/0',
-          isHighlighted: false
+          isHighlighted: index === 0
         }));
         
         setManagers(transformedManagers);
+        
+        // Process projects data
+        const transformedProjects = dashboardData.projects.map((project: Project, index: number) => {
+          // Generate a color based on status
+          let color;
+          switch (project.status) {
+            case 'in-progress':
+              color = 'bg-indigo-500';
+              break;
+            case 'completed':
+              color = 'bg-teal-500';
+              break;
+            case 'on-hold':
+              color = 'bg-purple-500';
+              break;
+            default: // planned
+              color = 'bg-blue-500';
+          }
+          
+          // Calculate timeAgo
+          const startDate = new Date(project.startDate);
+          const now = new Date();
+          const diffTime = Math.abs(now.getTime() - startDate.getTime());
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          
+          let timeAgo;
+          if (diffDays < 7) {
+            timeAgo = `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+          } else if (diffDays < 30) {
+            const weeks = Math.floor(diffDays / 7);
+            timeAgo = `${weeks} week${weeks === 1 ? '' : 's'} ago`;
+          } else {
+            const months = Math.floor(diffDays / 30);
+            timeAgo = `${months} month${months === 1 ? '' : 's'} ago`;
+          }
+          
+          return {
+            id: project._id,
+            title: project.name,
+            color,
+            user: {
+              name: project.projectManager?.name || 'Unassigned',
+              avatar: `/placeholder.svg?height=60&width=60`,
+              timeAgo,
+            },
+          };
+        });
+        
+        setProjects(transformedProjects);
       } else {
         setManagers([]);
+        setProjects([]);
         console.warn('Unexpected response format:', response.data);
       }
     } catch (err) {
-      let errorMessage = 'Failed to fetch managers';
+      let errorMessage = 'Failed to fetch dashboard data';
       
       if (axios.isAxiosError(err)) {
         errorMessage = err.response?.data?.message || errorMessage;
@@ -83,54 +134,11 @@ const Dashboard: React.FC = () => {
       
       setError(errorMessage);
       toast.error(errorMessage);
-      console.error("Error fetching managers:", err);
+      console.error("Error fetching dashboard data:", err);
     } finally {
       setLoading(false);
     }
   };
-
-  const projects: Project[] = [
-    {
-      id: 1,
-      title: "Billing Application",
-      color: "bg-teal-500",
-      user: {
-        name: "Thomas Hope",
-        avatar: "/placeholder.svg?height=60&width=60",
-        timeAgo: "2 weeks ago",
-      },
-    },
-    {
-      id: 2,
-      title: "Ecommerce Project",
-      color: "bg-indigo-500",
-      user: {
-        name: "Tony Andrew",
-        avatar: "/placeholder.svg?height=60&width=60",
-        timeAgo: "2 weeks ago",
-      },
-    },
-    {
-      id: 3,
-      title: "Analytics Dashboard",
-      color: "bg-purple-500",
-      user: {
-        name: "Sarah Johnson",
-        avatar: "/placeholder.svg?height=60&width=60",
-        timeAgo: "3 weeks ago",
-      },
-    },
-    {
-      id: 4,
-      title: "Mobile Application",
-      color: "bg-blue-500",
-      user: {
-        name: "Michael Chen",
-        avatar: "/placeholder.svg?height=60&width=60",
-        timeAgo: "1 month ago",
-      },
-    },
-  ];
 
   const renderManagerSection = () => {
     if (loading && !managers.length) {
@@ -160,7 +168,7 @@ const Dashboard: React.FC = () => {
         <div className="w-full bg-gray-800/40 rounded-lg overflow-hidden shadow-lg p-6 text-center">
           <p className="text-red-400">{error}</p>
           <button 
-            onClick={fetchManagers} 
+            onClick={fetchDashboardData} 
             className="mt-4 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-md text-white"
           >
             Try Again
@@ -222,9 +230,30 @@ const Dashboard: React.FC = () => {
               </motion.div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
-                {projects.map((project, index) => (
-                  <ProjectCard key={project.id} project={project} delay={index} />
-                ))}
+                {loading && !projects.length ? (
+                  // Project loading skeletons
+                  Array(4).fill(null).map((_, index) => (
+                    <div key={index} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 animate-pulse h-48">
+                      <div className="h-6 bg-gray-600 rounded w-40 mb-4"></div>
+                      <div className="space-y-3">
+                        <div className="h-4 bg-gray-700 rounded w-full"></div>
+                        <div className="h-4 bg-gray-700 rounded w-3/4"></div>
+                      </div>
+                      <div className="flex items-center space-x-3 mt-6">
+                        <div className="w-10 h-10 bg-gray-600 rounded-full"></div>
+                        <div className="h-4 bg-gray-700 rounded w-24"></div>
+                      </div>
+                    </div>
+                  ))
+                ) : projects.length === 0 ? (
+                  <div className="col-span-full text-center py-8 text-gray-400">
+                    No projects found
+                  </div>
+                ) : (
+                  projects.map((project, index) => (
+                    <ProjectCard key={project.id} project={project} delay={index} />
+                  ))
+                )}
               </div>
             </section>
 
