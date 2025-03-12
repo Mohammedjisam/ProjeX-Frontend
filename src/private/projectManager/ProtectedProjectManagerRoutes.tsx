@@ -11,7 +11,7 @@ const ProtectedProjectManagerRoutes: React.FC<Props> = ({ children }) => {
   const projectManagerData = useSelector((state: RootState) => state.projectManager.projectManagerData);
 
   if (!projectManagerData) {
-    return <Navigate to="/project-manager" />;
+    return <Navigate to="/projectmanager" />;
   }
   return children;
 };

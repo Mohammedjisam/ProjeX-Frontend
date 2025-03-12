@@ -156,7 +156,7 @@ const DeveloperManagement: React.FC = () => {
             <div>
               <h1 className="text-3xl font-bold text-white mb-2">Developer Management</h1>
             </div>
-           
+            
           </div>
           
           <div className="flex items-center p-3 bg-gray-800 rounded-lg">

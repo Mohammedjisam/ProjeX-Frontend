@@ -11,7 +11,7 @@ const ProtectedProjectManagerLogin: React.FC<Props> = ({ children }) => {
   const projectManagerData = useSelector((state: RootState) => state.projectManager.projectManagerData);
 
   if (projectManagerData) {
-    return <Navigate to="/project-manager/dashboard" />;
+    return <Navigate to="/projectmanager/dashboard" />;
   }
   return children;
 };
