@@ -3,14 +3,46 @@ import { cn } from "../../lib/utils";
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
+import axiosInstance from "../../utils/AxiosConfig"; // Update this path
 
 export function Dashboard() {
   // Animation states
   const [mounted, setMounted] = useState(false);
+  const [projects, setProjects] = useState([]);
+  const [recentProjects, setRecentProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   useEffect(() => {
     setMounted(true);
+    fetchProjects();
   }, []);
+  
+  const fetchProjects = async () => {
+    try {
+      setLoading(true);
+      // Fetch all projects
+      const response = await axiosInstance.get("/project/getallprojects");
+      
+      if (response.data.success) {
+        const allProjects = response.data.data;
+        
+        // Set main project cards (first 3 projects or all if less than 3)
+        setProjects(allProjects.slice(0, 3));
+        
+        // Set recent projects (latest 2 by creation date)
+        const sortedByDate = [...allProjects].sort((a, b) => 
+          new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setRecentProjects(sortedByDate.slice(0, 2));
+      }
+    } catch (err) {
+      console.error("Error fetching projects:", err);
+      setError("Failed to load projects. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
   
   return (
     <div className="flex h-screen bg-gray-950 text-white overflow-hidden">
@@ -19,45 +51,58 @@ export function Dashboard() {
         <Header />
         
         <main className="flex-1 overflow-y-auto bg-gray-950 p-6">
-          <div className={cn(
-            "transition-all duration-500 transform",
-            mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-          )}>
-            <section className="mb-8">
-              <h2 className="text-2xl font-bold mb-6">Projects</h2>
+          {loading ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-xl">Loading projects...</div>
+            </div>
+          ) : error ? (
+            <div className="text-red-500 text-center p-4">{error}</div>
+          ) : (
+            <div className={cn(
+              "transition-all duration-500 transform",
+              mounted ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            )}>
+              <section className="mb-8">
+                <h2 className="text-2xl font-bold mb-6">Projects</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {projects.map((project, index) => (
+                    <ProjectCard 
+                      key={project._id} 
+                      title={project.name}
+                      progress={project.completionPercentage || 0}
+                      delay={index * 100}
+                      mounted={mounted}
+                    />
+                  ))}
+                </div>
+              </section>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {projectCards.map((project, index) => (
-                  <ProjectCard 
-                    key={project.title} 
-                    {...project} 
-                    delay={index * 100}
-                    mounted={mounted}
-                  />
-                ))}
-              </div>
-            </section>
-            
-            <section>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold">Recent Projects</h2>
-                <button className="flex items-center text-sm text-gray-400 hover:text-white transition-colors">
-                  View all <ArrowRight className="ml-1 h-4 w-4" />
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                {recentProjects.map((project, index) => (
-                  <RecentProjectItem 
-                    key={project.title} 
-                    {...project} 
-                    delay={300 + index * 100}
-                    mounted={mounted}
-                  />
-                ))}
-              </div>
-            </section>
-          </div>
+              <section>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold">Recent Projects</h2>
+                  <button 
+                    className="flex items-center text-sm text-gray-400 hover:text-white transition-colors"
+                    onClick={() => window.location.href = "/projects"}
+                  >
+                    View all <ArrowRight className="ml-1 h-4 w-4" />
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  {recentProjects.map((project, index) => (
+                    <RecentProjectItem 
+                      key={project._id} 
+                      title={project.name} 
+                      date={new Date(project.startDate).toLocaleDateString()}
+                      delay={300 + index * 100}
+                      mounted={mounted}
+                    />
+                  ))}
+                </div>
+              </section>
+            </div>
+          )}
         </main>
       </div>
     </div>
@@ -138,13 +183,4 @@ function RecentProjectItem({ title, date, delay, mounted }: RecentProjectProps) 
   );
 }
 
-const projectCards = [
-  { title: "Translator application", progress: 70 },
-  { title: "Billing Application", progress: 40 },
-  { title: "Ecommerce", progress: 70 },
-];
-
-const recentProjects = [
-  { title: "Ecommerce", date: "05/05/2024" },
-  { title: "Hospital Management Software", date: "05/05/2024" },
-];
+export default Dashboard;

@@ -71,5 +71,4 @@ const navItems = [
   { icon: MessageSquare, label: "Chats", path: "/manager/chats" },
   { icon: Calendar, label: "Meetings", path: "/manager/meetings" },
   { icon: UserCircle, label: "Profile", path: "/manager/profile" },
-  { icon: Settings, label: "Settings", path: "/manager/settings" },
 ]

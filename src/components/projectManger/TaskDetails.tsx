@@ -8,15 +8,15 @@ import type { RootState } from "../../redux/Store";
 import {
   ArrowLeft,
   Calendar,
-  DollarSign,
+  AlarmClock,
   Clock,
-  Target,
-  User,
   CheckCircle2,
-  ListTodo,
-  CalendarClock,
   MessageSquare,
+  User,
   Briefcase,
+  FileText,
+  AlertTriangle,
+  Flag,
 } from "lucide-react";
 import { format } from "date-fns";
 import axiosInstance from "../../utils/AxiosConfig";
@@ -42,98 +42,87 @@ import {
   AvatarFallback,
   AvatarImage,
 } from "../../components/ui/avatar";
-import { Progress } from "../../components/ui/progress";
 import { Skeleton } from "../../components/ui/skeleton";
 
-interface ProjectDetails {
+interface TaskDetails {
   _id: string;
-  name: string;
+  title: string;
   description: string;
-  clientName: string;
-  budget: number;
-  startDate: string;
-  endDate: string;
-  goal: string;
-  status: "planned" | "in-progress" | "completed" | "on-hold";
-  projectManager: {
+  project: {
+    _id: string;
+    name: string;
+    clientName: string;
+    status: string;
+  };
+  assignee: {
+    _id: string;
+    name: string;
+    email: string;
+    role: string;
+    profileImage?: string;
+  };
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'pending' | 'in-progress' | 'completed' | 'on-hold';
+  dueDate: string;
+  remarks?: string;
+  createdBy: {
     _id: string;
     name: string;
     email: string;
     profileImage?: string;
   };
-  comments: Array<{
-    _id: string;
-    text: string;
-    author: {
-      _id: string;
-      name: string;
-      profileImage?: string;
-    };
-    createdAt: string;
-  }>;
   createdAt: string;
   updatedAt: string;
-  completionPercentage?: number;
+  daysRemaining: number;
+  isOverdue: boolean;
 }
 
-const ProjectDetails: React.FC = () => {
-  // Change from projectId to id to match the route parameter in ProjectManagerRoutes
-  const { id } = useParams<{ id: string }>();
-  const [project, setProject] = useState<ProjectDetails | null>(null);
+const TaskDetails: React.FC = () => {
+  const { taskId } = useParams<{ id: string }>();
+  const [task, setTask] = useState<TaskDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-  const projectManagerData = useSelector(
+  const userData = useSelector(
     (state: RootState) => state.projectManager.projectManagerData
   );
 
   useEffect(() => {
-    const fetchProjectDetails = async () => {
+    const fetchTaskDetails = async () => {
       try {
         setLoading(true);
         setError(null);
-        console.log("Fetching project with ID:", id);
+        console.log("Fetching task with ID:", taskId);
 
-        let response;
-        if (projectManagerData?._id) {
-          // Use the correct endpoint from your API
-          response = await axiosInstance.get(
-            `/project/projectmanager/${projectManagerData._id}/project/${id}`
-          );
-          console.log("Using manager-specific endpoint");
-        } else {
-          // Use the correct general endpoint from your API
-          response = await axiosInstance.get(`/project/getallprojects/${id}`);
-          console.log("Using general project endpoint");
-        }
-
+        const response = await axiosInstance.get(`/task/${taskId}`);
+        
         console.log("API Response:", response.data);
 
         if (response.data.success) {
-          setProject(response.data.data);
+          setTask(response.data.data);
         } else {
           setError(
-            "Failed to fetch project details: " +
+            "Failed to fetch task details: " +
               (response.data.message || "Unknown error")
           );
         }
       } catch (err: any) {
-        console.error("Error fetching project details:", err);
+        console.error("Error fetching task details:", err);
         setError(
-          `Error fetching project details: ${err.message || "Unknown error"}`
+          `Error fetching task details: ${err.message || "Unknown error"}`
         );
       } finally {
         setLoading(false);
       }
     };
 
-    if (id) {
-      fetchProjectDetails();
+    if (taskId) {
+      fetchTaskDetails();
     } else {
-      setError("No project ID provided");
+      setError("No task ID provided");
       setLoading(false);
     }
-  }, [id, projectManagerData?._id]);
+  }, [taskId]);
 
   const formatDate = (dateString: string) => {
     try {
@@ -145,7 +134,7 @@ const ProjectDetails: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
-      case "planned":
+      case "pending":
         return "bg-yellow-500/10 text-yellow-500";
       case "in-progress":
         return "bg-blue-500/10 text-blue-500";
@@ -158,12 +147,19 @@ const ProjectDetails: React.FC = () => {
     }
   };
 
-  const calculateDaysLeft = (endDate: string) => {
-    const today = new Date();
-    const end = new Date(endDate);
-    const diffTime = end.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+  const getPriorityColor = (priority: string) => {
+    switch (priority.toLowerCase()) {
+      case "low":
+        return "bg-blue-500/10 text-blue-500";
+      case "medium":
+        return "bg-yellow-500/10 text-yellow-500";
+      case "high":
+        return "bg-orange-500/10 text-orange-500";
+      case "urgent":
+        return "bg-red-500/10 text-red-500";
+      default:
+        return "bg-gray-500/10 text-gray-500";
+    }
   };
 
   const renderSkeleton = () => (
@@ -207,12 +203,10 @@ const ProjectDetails: React.FC = () => {
               variant="ghost"
               size="sm"
               className="text-gray-400 hover:text-white mb-4"
-              asChild
+              onClick={() => navigate(-1)}
             >
-              <Link to="/projectmanager/projects">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Projects
-              </Link>
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back
             </Button>
 
             {loading ? (
@@ -232,34 +226,43 @@ const ProjectDetails: React.FC = () => {
                   </div>
                 </CardContent>
               </Card>
-            ) : project ? (
+            ) : task ? (
               <>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
                   <div>
                     <h1 className="text-2xl font-bold text-white">
-                      {project.name}
+                      {task.title}
                     </h1>
                     <p className="text-gray-400">
-                      Client: {project.clientName}
+                      Project: <Link to={`/projectmanager/projects/${task.project._id}`} className="hover:text-blue-400">{task.project.name}</Link>
                     </p>
                   </div>
-                  <Badge
-                    className={`${getStatusColor(
-                      project.status
-                    )} px-3 py-1 text-xs uppercase`}
-                  >
-                    {project.status}
-                  </Badge>
+                  <div className="flex space-x-3">
+                    <Badge
+                      className={`${getPriorityColor(
+                        task.priority
+                      )} px-3 py-1 text-xs uppercase`}
+                    >
+                      {task.priority}
+                    </Badge>
+                    <Badge
+                      className={`${getStatusColor(
+                        task.status
+                      )} px-3 py-1 text-xs uppercase`}
+                    >
+                      {task.status}
+                    </Badge>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                   <Card className="bg-[#252b3b] border-gray-700 col-span-2">
                     <CardHeader>
                       <CardTitle className="text-white">
-                        Project Overview
+                        Task Details
                       </CardTitle>
                       <CardDescription className="text-gray-400">
-                        Created on {formatDate(project.createdAt)}
+                        Created on {formatDate(task.createdAt)}
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
@@ -267,99 +270,109 @@ const ProjectDetails: React.FC = () => {
                         <div className="flex items-start space-x-3">
                           <Calendar className="h-5 w-5 text-blue-400 mt-0.5" />
                           <div>
-                            <p className="text-gray-400 text-sm">Timeline</p>
+                            <p className="text-gray-400 text-sm">Due Date</p>
                             <p className="text-white">
-                              {formatDate(project.startDate)} -{" "}
-                              {formatDate(project.endDate)}
+                              {formatDate(task.dueDate)}
                             </p>
                           </div>
                         </div>
 
                         <div className="flex items-start space-x-3">
-                          <DollarSign className="h-5 w-5 text-green-400 mt-0.5" />
+                          <AlarmClock className="h-5 w-5 text-orange-400 mt-0.5" />
                           <div>
-                            <p className="text-gray-400 text-sm">Budget</p>
+                            <p className="text-gray-400 text-sm">Days Remaining</p>
+                            <p className={`${task.isOverdue ? 'text-red-400' : 'text-white'}`}>
+                              {task.isOverdue 
+                                ? 'Overdue' 
+                                : task.daysRemaining > 0 
+                                  ? `${task.daysRemaining} days` 
+                                  : 'Due today'
+                              }
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start space-x-3">
+                          <Flag className="h-5 w-5 text-yellow-400 mt-0.5" />
+                          <div>
+                            <p className="text-gray-400 text-sm">Priority</p>
+                            <p className="text-white capitalize">{task.priority}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start space-x-3">
+                          <CheckCircle2 className="h-5 w-5 text-green-400 mt-0.5" />
+                          <div>
+                            <p className="text-gray-400 text-sm">Status</p>
+                            <p className="text-white capitalize">{task.status}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start space-x-3">
+                          <Briefcase className="h-5 w-5 text-purple-400 mt-0.5" />
+                          <div>
+                            <p className="text-gray-400 text-sm">Project</p>
                             <p className="text-white">
-                              ${project.budget.toLocaleString()}
+                              <Link to={`/projectmanager/projects/${task.project._id}`} className="hover:text-blue-400">
+                                {task.project.name}
+                              </Link>
                             </p>
                           </div>
                         </div>
 
                         <div className="flex items-start space-x-3">
-                          <Clock className="h-5 w-5 text-yellow-400 mt-0.5" />
+                          <User className="h-5 w-5 text-cyan-400 mt-0.5" />
                           <div>
-                            <p className="text-gray-400 text-sm">
-                              Days Remaining
-                            </p>
-                            <p className="text-white">
-                              {calculateDaysLeft(project.endDate)} days
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start space-x-3">
-                          <Target className="h-5 w-5 text-purple-400 mt-0.5" />
-                          <div>
-                            <p className="text-gray-400 text-sm">Goal</p>
-                            <p className="text-white">{project.goal}</p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start space-x-3">
-                          <User className="h-5 w-5 text-orange-400 mt-0.5" />
-                          <div>
-                            <p className="text-gray-400 text-sm">
-                              Project Manager
-                            </p>
-                            <p className="text-white">
-                              {project.projectManager?.name || "Not assigned"}
-                            </p>
-                          </div>
-                        </div>
-
-                        <div className="flex items-start space-x-3">
-                          <CheckCircle2 className="h-5 w-5 text-cyan-400 mt-0.5" />
-                          <div>
-                            <p className="text-gray-400 text-sm">Completion</p>
-                            <div className="w-full">
-                              <div className="flex justify-between mb-1">
-                                <span className="text-white">
-                                  {project.completionPercentage || 0}%
-                                </span>
-                              </div>
-                              <Progress
-                                value={project.completionPercentage || 0}
-                                className="h-2 bg-gray-700"
-                              />
-                            </div>
+                            <p className="text-gray-400 text-sm">Created By</p>
+                            <p className="text-white">{task.createdBy?.name || "Unknown"}</p>
                           </div>
                         </div>
                       </div>
 
                       <div>
-                        <h3 className="text-white font-medium mb-2">
-                          Description
-                        </h3>
-                        <p className="text-gray-300">{project.description}</p>
+                        <h3 className="text-white font-medium mb-2">Description</h3>
+                        <p className="text-gray-300">{task.description}</p>
                       </div>
+
+                      {task.remarks && (
+                        <div>
+                          <h3 className="text-white font-medium mb-2">Remarks</h3>
+                          <p className="text-gray-300">{task.remarks}</p>
+                        </div>
+                      )}
                     </CardContent>
                     <CardFooter className="border-t border-gray-700 flex justify-between pt-6">
-                      <Button className="bg-blue-600 hover:bg-blue-700 text-white"
-                      onClick={() =>
-                          navigate(`/projectmanager/projects/${id}/tasks`)
-                        }>
-                        <ListTodo className="mr-2 h-4 w-4" />
-                        Show Tasks
+                      <Button 
+                        className={`${
+                          task.status === 'completed' 
+                            ? 'bg-green-600 hover:bg-green-700' 
+                            : 'bg-blue-600 hover:bg-blue-700'
+                        } text-white`}
+                        onClick={() => {
+                          // This would be the update task endpoint
+                          if (task.status !== 'completed') {
+                            navigate(`/projectmanager/tasks/${id}/edit`);
+                          }
+                        }}
+                      >
+                        {task.status === 'completed' ? (
+                          <>
+                            <CheckCircle2 className="mr-2 h-4 w-4" />
+                            Completed
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="mr-2 h-4 w-4" />
+                            Update Status
+                          </>
+                        )}
                       </Button>
                       <Button
                         variant="outline"
                         className="border-gray-600 text-white hover:bg-gray-700"
-                        onClick={() =>
-                          navigate(`/projectmanager/projects/${id}/addtask`)
-                        }
                       >
-                        <CalendarClock className="mr-2 h-4 w-4" />
-                        Schedule Task
+                        <FileText className="mr-2 h-4 w-4" />
+                        Add Remarks
                       </Button>
                     </CardFooter>
                   </Card>
@@ -368,34 +381,51 @@ const ProjectDetails: React.FC = () => {
                     <Card className="bg-[#252b3b] border-gray-700">
                       <CardHeader>
                         <CardTitle className="text-white text-lg">
-                          Project Manager
+                          Assigned To
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <div className="flex items-center space-x-4">
                           <Avatar className="h-12 w-12">
-                            {project.projectManager?.profileImage ? (
+                            {task.assignee?.profileImage ? (
                               <AvatarImage
-                                src={project.projectManager.profileImage}
-                                alt={project.projectManager.name}
+                                src={task.assignee.profileImage}
+                                alt={task.assignee.name}
                               />
                             ) : (
                               <AvatarFallback className="bg-blue-600 text-white">
-                                {project.projectManager?.name.charAt(0) || "PM"}
+                                {task.assignee?.name.charAt(0) || "U"}
                               </AvatarFallback>
                             )}
                           </Avatar>
                           <div>
                             <p className="text-white font-medium">
-                              {project.projectManager?.name}
+                              {task.assignee?.name}
                             </p>
                             <p className="text-gray-400 text-sm">
-                              {project.projectManager?.email}
+                              {task.assignee?.email}
                             </p>
+                            <Badge className="mt-2 bg-gray-700 text-white">
+                              {task.assignee?.role}
+                            </Badge>
                           </div>
                         </div>
                       </CardContent>
                     </Card>
+
+                    {task.isOverdue && task.status !== 'completed' && (
+                      <Card className="bg-[#2b2535] border-red-900">
+                        <CardContent className="pt-6">
+                          <div className="flex items-center space-x-3 text-red-400">
+                            <AlertTriangle className="h-5 w-5" />
+                            <p className="font-medium">This task is overdue</p>
+                          </div>
+                          <p className="text-gray-300 mt-2 text-sm">
+                            The due date was {formatDate(task.dueDate)}. Please update the status or extend the deadline.
+                          </p>
+                        </CardContent>
+                      </Card>
+                    )}
 
                     <Card className="bg-[#252b3b] border-gray-700">
                       <CardHeader>
@@ -407,29 +437,30 @@ const ProjectDetails: React.FC = () => {
                         <Button
                           variant="outline"
                           className="w-full justify-start border-gray-700 text-white hover:bg-gray-700"
+                          onClick={() => navigate(`/projectmanager/tasks/${id}/edit`)}
                         >
-                          <MessageSquare className="mr-2 h-4 w-4 text-blue-400" />
-                          Add Comment
+                          <FileText className="mr-2 h-4 w-4 text-blue-400" />
+                          Edit Task
                         </Button>
                         <Button
                           variant="outline"
                           className="w-full justify-start border-gray-700 text-white hover:bg-gray-700"
                         >
-                          <Briefcase className="mr-2 h-4 w-4 text-purple-400" />
-                          Update Status
+                          <MessageSquare className="mr-2 h-4 w-4 text-purple-400" />
+                          Add Comment
                         </Button>
                       </CardContent>
                     </Card>
                   </div>
                 </div>
 
-                <Tabs defaultValue="comments" className="w-full">
+                <Tabs defaultValue="timeline" className="w-full">
                   <TabsList className="bg-[#252b3b] border-gray-700">
                     <TabsTrigger
-                      value="comments"
+                      value="timeline"
                       className="data-[state=active]:bg-gray-700"
                     >
-                      Comments ({project.comments?.length || 0})
+                      Timeline
                     </TabsTrigger>
                     <TabsTrigger
                       value="activity"
@@ -438,50 +469,49 @@ const ProjectDetails: React.FC = () => {
                       Activity Log
                     </TabsTrigger>
                   </TabsList>
-                  <TabsContent value="comments">
+                  <TabsContent value="timeline">
                     <Card className="bg-[#252b3b] border-gray-700 mt-6">
                       <CardContent className="pt-6">
-                        {project.comments && project.comments.length > 0 ? (
-                          <div className="space-y-4">
-                            {project.comments.map((comment) => (
-                              <div
-                                key={comment._id}
-                                className="flex space-x-4 pb-4 border-b border-gray-700"
-                              >
-                                <Avatar className="h-8 w-8">
-                                  {comment.author?.profileImage ? (
-                                    <AvatarImage
-                                      src={comment.author.profileImage}
-                                      alt={comment.author.name}
-                                    />
-                                  ) : (
-                                    <AvatarFallback className="bg-gray-600 text-white">
-                                      {comment.author?.name.charAt(0) || "U"}
-                                    </AvatarFallback>
-                                  )}
-                                </Avatar>
-                                <div className="flex-1">
-                                  <div className="flex items-center justify-between">
-                                    <p className="text-white font-medium">
-                                      {comment.author?.name}
-                                    </p>
-                                    <p className="text-gray-400 text-xs">
-                                      {formatDate(comment.createdAt)}
-                                    </p>
-                                  </div>
-                                  <p className="text-gray-300 mt-1">
-                                    {comment.text}
-                                  </p>
-                                </div>
+                        <div className="space-y-4">
+                          <div className="border-l-2 border-blue-500 pl-4 pb-4">
+                            <div className="flex justify-between">
+                              <p className="text-white font-medium">Task Created</p>
+                              <p className="text-gray-400 text-sm">{formatDate(task.createdAt)}</p>
+                            </div>
+                            <p className="text-gray-300 mt-1">
+                              Created by {task.createdBy.name}
+                            </p>
+                          </div>
+                          
+                          {task.createdAt !== task.updatedAt && (
+                            <div className="border-l-2 border-yellow-500 pl-4 pb-4">
+                              <div className="flex justify-between">
+                                <p className="text-white font-medium">Task Updated</p>
+                                <p className="text-gray-400 text-sm">{formatDate(task.updatedAt)}</p>
                               </div>
-                            ))}
+                              <p className="text-gray-300 mt-1">
+                                Last modified on {formatDate(task.updatedAt)}
+                              </p>
+                            </div>
+                          )}
+                          
+                          <div className={`border-l-2 ${task.isOverdue ? 'border-red-500' : 'border-green-500'} pl-4 pb-4`}>
+                            <div className="flex justify-between">
+                              <p className="text-white font-medium">Due Date</p>
+                              <p className={`text-sm ${task.isOverdue ? 'text-red-400' : 'text-gray-400'}`}>
+                                {formatDate(task.dueDate)}
+                              </p>
+                            </div>
+                            <p className={`mt-1 ${task.isOverdue ? 'text-red-400' : 'text-gray-300'}`}>
+                              {task.isOverdue 
+                                ? 'This task is overdue' 
+                                : task.daysRemaining > 0 
+                                  ? `${task.daysRemaining} days remaining` 
+                                  : 'Due today'
+                              }
+                            </p>
                           </div>
-                        ) : (
-                          <div className="text-center text-gray-400 py-8">
-                            <MessageSquare className="mx-auto h-12 w-12 opacity-20 mb-2" />
-                            <p>No comments yet</p>
-                          </div>
-                        )}
+                        </div>
                       </CardContent>
                     </Card>
                   </TabsContent>
@@ -501,7 +531,7 @@ const ProjectDetails: React.FC = () => {
               <Card className="bg-[#252b3b] border-gray-700">
                 <CardContent className="pt-6">
                   <div className="text-center text-gray-400 py-8">
-                    <p>Project not found</p>
+                    <p>Task not found</p>
                   </div>
                 </CardContent>
               </Card>
@@ -513,4 +543,4 @@ const ProjectDetails: React.FC = () => {
   );
 };
 
-export default ProjectDetails;
+export default TaskDetails;

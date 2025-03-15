@@ -7,6 +7,14 @@ import ProjectCard from './ProjectCard';
 import ManagerCard from './ManagerCard';
 import Sidebar from './Sidebar';
 
+interface Manager {
+  _id: string;
+  name: string;
+  email: string;
+  phoneNumber: string;
+  location?: string;
+}
+
 interface Project {
   _id: string;
   name: string;
@@ -21,21 +29,10 @@ interface Project {
   };
 }
 
-interface Manager {
-  _id: string;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  avatar?: string;
-  location?: string;
-  projectCount?: string;
-  isHighlighted?: boolean;
-}
-
 const Dashboard: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
   const [managers, setManagers] = useState<Manager[]>([]);
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,22 +53,30 @@ const Dashboard: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axiosInstance.get('/companyadmin/dashboard');
-
-      if (response.data && response.data.success) {
-        const dashboardData = response.data.data;
+      // Fetch managers data
+      const managersResponse = await axiosInstance.get('/companyAdmin/getallmanager');
+      // Fetch projects data with populated project manager
+      const projectsResponse = await axiosInstance.get('/project/getallprojects');
+      
+      if (managersResponse.data && managersResponse.data.success) {
+        const managersData = managersResponse.data.data;
         
         // Process managers data
-        const transformedManagers = dashboardData.managers.map((manager: Manager, index: number) => ({
+        const transformedManagers = managersData.map((manager: Manager, index: number) => ({
           ...manager,
           avatar: `/placeholder.svg?height=60&width=60`,
+          location: manager.location || "Unknown",
           isHighlighted: index === 0
         }));
         
         setManagers(transformedManagers);
+      }
+      
+      if (projectsResponse.data && projectsResponse.data.success) {
+        const projectsData = projectsResponse.data.data;
         
         // Process projects data
-        const transformedProjects = dashboardData.projects.map((project: Project, index: number) => {
+        const transformedProjects = projectsData.map((project: Project) => {
           // Generate a color based on status
           let color;
           switch (project.status) {
@@ -105,12 +110,34 @@ const Dashboard: React.FC = () => {
             timeAgo = `${months} month${months === 1 ? '' : 's'} ago`;
           }
           
+          // Ensure we handle the projectManager data properly
+          let managerName = 'Unassigned';
+          let managerId = '';
+          
+          // Check if projectManager exists and has expected properties
+          if (project.projectManager) {
+            // If projectManager is already populated as an object with name
+            if (typeof project.projectManager === 'object' && project.projectManager.name) {
+              managerName = project.projectManager.name;
+              managerId = project.projectManager._id;
+            } 
+            // If projectManager is just an ID string, find the manager by ID
+            else if (typeof project.projectManager === 'string') {
+              const manager = managers.find(m => m._id === project.projectManager);
+              if (manager) {
+                managerName = manager.name;
+                managerId = manager._id;
+              }
+            }
+          }
+          
           return {
             id: project._id,
             title: project.name,
             color,
+            managerId,
             user: {
-              name: project.projectManager?.name || 'Unassigned',
+              name: managerName,
               avatar: `/placeholder.svg?height=60&width=60`,
               timeAgo,
             },
@@ -118,10 +145,6 @@ const Dashboard: React.FC = () => {
         });
         
         setProjects(transformedProjects);
-      } else {
-        setManagers([]);
-        setProjects([]);
-        console.warn('Unexpected response format:', response.data);
       }
     } catch (err) {
       let errorMessage = 'Failed to fetch dashboard data';
@@ -138,6 +161,17 @@ const Dashboard: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Function to calculate project count for each manager
+  const getProjectCountForManager = (managerId: string) => {
+    if (!projects.length) return "0";
+    
+    const count = projects.filter(project => 
+      project.user.name === managers.find(m => m._id === managerId)?.name
+    ).length;
+    
+    return `${count}/${projects.length}`;
   };
 
   const renderManagerSection = () => {
@@ -191,9 +225,8 @@ const Dashboard: React.FC = () => {
                 id: parseInt(manager._id.slice(-4), 16) || index + 1,
                 name: manager.name,
                 avatar: manager.avatar || `/placeholder.svg?height=60&width=60`,
-                projectCount: manager.projectCount || "0/0",
-                phone: manager.phoneNumber,
-                location: manager.location || "Unknown",
+                projectCount: getProjectCountForManager(manager._id),
+                phone: manager.phoneNumber || "Not provided",
                 isHighlighted: index === 0 
               }} 
               delay={index} 

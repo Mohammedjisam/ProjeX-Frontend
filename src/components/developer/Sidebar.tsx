@@ -9,7 +9,7 @@ import {
   MessageSquare, 
   Calendar, 
   UserCircle,
-  LogOut
+  LogOut,User
 } from 'lucide-react';
 
 const sidebarItems = [
@@ -90,8 +90,15 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, onToggle }) => {
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-full bg-[#1e293b] flex items-center justify-center">
             <span className="text-white font-medium">
-              {developerData?.name ? developerData.name.charAt(0).toUpperCase() : 'P'}
-            </span>
+            {developerData?.profileImage ? (
+              <img 
+                src={developerData.profileImage} 
+                alt={`${developerData?.name}'s profile`}
+                className="h-full w-full object-cover rounded-full"
+              />
+            ) : (
+              <User className="h-5 w-5 text-gray-300" />
+            )}            </span>
           </div>
           {!collapsed && (
             <div className="flex flex-col">
