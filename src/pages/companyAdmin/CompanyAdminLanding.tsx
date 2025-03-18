@@ -78,9 +78,10 @@ const CompanyAdminLandingPage: React.FC = () => {
   const pricingTiers: PricingTierProps[] = [
     {
       name: "Basic",
-      price: 15,
+      price: 1500,
       features: [
         "Up to 1 branch",
+        "Up to 10 users",
         "Unlimited tasks and projects",
         "Meeting with upto 3 persons",
         "Chat between employees",
@@ -89,10 +90,11 @@ const CompanyAdminLandingPage: React.FC = () => {
     },
     {
       name: "Pro",
-      price: 20,
+      price: 2000,
       popular: true,
       features: [
         "Up to 3 branch",
+        "Up to 30 users",
         "Unlimited tasks and projects",
         "Meeting with upto 5 persons",
         "Chat between employees",
@@ -101,9 +103,10 @@ const CompanyAdminLandingPage: React.FC = () => {
     },
     {
       name: "Business",
-      price: 30,
+      price: 3000,
       features: [
         "Up to 5 branch",
+        "Up to 50 users",
         "Unlimited tasks and projects",
         "Meeting with upto 10 persons",
         "Chat between employees",
@@ -340,7 +343,7 @@ const CompanyAdminLandingPage: React.FC = () => {
                 <div className="p-8">
                   <h3 className="text-2xl font-bold mb-4">{tier.name}</h3>
                   <div className="mb-8">
-                    <span className="text-5xl font-bold text-primary">${tier.price}</span>
+                    <span className="text-5xl font-bold text-primary">₹{tier.price}</span>
                     <span className="text-foreground/60">/monthly</span>
                   </div>
                   <button
