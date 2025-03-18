@@ -8,6 +8,7 @@ import ManagersTable from '../components/companyAdmin/ManagersTable';
 import AddManagerPage from '../components/companyAdmin/AddManagerPage';
 import FirstPage from '../pages/companyAdmin/FirstPage';
 import Profile from '../components/companyAdmin/Profile';
+import PaymentPage from '../pages/companyAdmin/Stripe';
 
 
 function CompanyAdminRoutes() {
@@ -20,6 +21,7 @@ function CompanyAdminRoutes() {
       <Route path='managers' element={<ProtectedCompanyAdminRoutes><ManagersTable/></ProtectedCompanyAdminRoutes>}/>
       <Route path='addmanager' element={<ProtectedCompanyAdminRoutes><AddManagerPage/></ProtectedCompanyAdminRoutes>}/>
       <Route path='landing' element={<ProtectedCompanyAdminRoutes><FirstPage/></ProtectedCompanyAdminRoutes>}/>
+      <Route path='payment' element={<ProtectedCompanyAdminRoutes><PaymentPage/></ProtectedCompanyAdminRoutes>}/>
       <Route path='profile' element={<ProtectedCompanyAdminRoutes><Profile/></ProtectedCompanyAdminRoutes>}/>
       </Routes>
     </div>

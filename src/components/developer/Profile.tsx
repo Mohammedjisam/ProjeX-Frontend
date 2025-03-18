@@ -110,12 +110,12 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-900">
-      <Header />
-      <div className="flex flex-1">
-        <Sidebar />
+    <div className="flex min-h-screen">
+      <Sidebar />
+      <div className=" flex-1">
+        <Header />
         
-        <div className="flex-1 p-6 ml-52">
+        <div className="flex-1 p-6 ">
           <div className="max-w-3xl mx-auto mt-8">
             <Card className="border-gray-700 bg-gray-800/50 backdrop-blur-sm shadow-xl">
               <CardHeader className="border-b border-gray-700 pb-4">

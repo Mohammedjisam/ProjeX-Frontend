@@ -23,11 +23,7 @@ const sidebarItems = [
     icon: CheckSquare,
     path: '/developer/tasks'
   },
-  {
-    name: 'Projects',
-    icon: FolderKanban,
-    path: '/developer/projects'
-  },
+  
   {
     name: 'Chats',
     icon: MessageSquare,
