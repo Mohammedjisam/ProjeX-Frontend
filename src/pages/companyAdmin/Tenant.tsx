@@ -110,7 +110,7 @@ const Tenant: React.FC = () => {
         });
         
         // Redirect to dashboard or home page
-        setTimeout(() => navigate('/companyadmin/dashboard'), 2000);
+        setTimeout(() => navigate('/companyadmin/subscriptions'), 2000);
       }
     } catch (error: any) {
       console.error('Error submitting form:', error);

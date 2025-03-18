@@ -164,9 +164,10 @@ const ManagersTable: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-900">
+    <div className="flex h-screen">
       <Sidebar />
-      <div className="flex-1 ml-[220px]">
+      <div className="flex-1 ml-[280px] mr-[30px]">
+      
         <main className="p-6">
           {renderContent()}
         </main>

@@ -10,6 +10,7 @@ import FirstPage from '../pages/companyAdmin/FirstPage';
 import Profile from '../components/companyAdmin/Profile';
 import PaymentPage from '../pages/companyAdmin/Stripe';
 import Tenant from '../pages/companyAdmin/Tenant';
+import Subscriptions from '../pages/companyAdmin/Subscriptions';
 
 
 function CompanyAdminRoutes() {
@@ -25,6 +26,7 @@ function CompanyAdminRoutes() {
       <Route path='payment' element={<ProtectedCompanyAdminRoutes><PaymentPage/></ProtectedCompanyAdminRoutes>}/>
       <Route path='profile' element={<ProtectedCompanyAdminRoutes><Profile/></ProtectedCompanyAdminRoutes>}/>
       <Route path='tenant/:paymentId' element={<ProtectedCompanyAdminRoutes><Tenant/></ProtectedCompanyAdminRoutes>}/>
+      <Route path='subscriptions' element={<ProtectedCompanyAdminRoutes><Subscriptions/></ProtectedCompanyAdminRoutes>}/>
 
       </Routes>
     </div>

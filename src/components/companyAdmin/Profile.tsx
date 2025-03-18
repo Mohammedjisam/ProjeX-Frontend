@@ -108,7 +108,7 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+    <div className="flex min-h-screen ">
       <Sidebar />
       
       <div className="flex-1 ml-[240px] p-6">
