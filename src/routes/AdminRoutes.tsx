@@ -7,6 +7,8 @@ import CompanyAdminManagement from '../components/admin/CompanyAdminManagementCo
 import ManagerManagement from '../components/admin/ManagerManagement';
 import ProjectManagerManagement from '../components/admin/ProjectManagerManagement';
 import DeveloperManagement from '../components/admin/DeveloperManagement';
+import CompanyTable from '../components/admin/CompanyTable';
+import ViewCompany from '../components/admin/ViewCompany';
 
 
 function AdminRoutes() {
@@ -20,6 +22,9 @@ function AdminRoutes() {
       <Route path='manager' element={<ProtectedAdminRoutes><ManagerManagement/></ProtectedAdminRoutes>}/>
       <Route path='projectmanager' element={<ProtectedAdminRoutes><ProjectManagerManagement/></ProtectedAdminRoutes>}/>
       <Route path='developer' element={<ProtectedAdminRoutes><DeveloperManagement/></ProtectedAdminRoutes>}/>
+      <Route path='company' element={<ProtectedAdminRoutes><CompanyTable/></ProtectedAdminRoutes>}/>
+      <Route path='company/:id' element={<ProtectedAdminRoutes><ViewCompany/></ProtectedAdminRoutes>}/>
+
       </Routes>
     </div>
   )

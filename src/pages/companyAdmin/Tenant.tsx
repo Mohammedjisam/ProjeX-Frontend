@@ -87,7 +87,7 @@ const Tenant: React.FC = () => {
     
     try {
       console.log("Sending data:", requestData);
-      const response = await axiosInstance.post('/tenant/addtenant', requestData);
+      const response = await axiosInstance.post('/company/addcompany', requestData);
       
       if (response.data.success) {
         setMessage({

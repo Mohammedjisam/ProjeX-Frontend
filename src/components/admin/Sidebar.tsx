@@ -1,5 +1,5 @@
 import React from "react";
-import { HomeIcon, DocumentTextIcon, CreditCardIcon, UsersIcon } from "../ui/icon";
+import { HomeIcon, DocumentTextIcon, CreditCardIcon, UsersIcon ,BuildingIcon  } from "../ui/icon";
 import { useNavigate } from "react-router-dom";
 
 type NavItem = {
@@ -19,6 +19,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   const [navigation, setNavigation] = React.useState<NavItem[]>([
     { name: "Dashboard", icon: HomeIcon, path: "/admin/dashboard", current: true },
     { name: "Plans", icon: DocumentTextIcon, path: "/admin/plans", current: false },
+    { name: "Company", icon: BuildingIcon  , path: "/admin/company", current: false },
     { name: "Subscriptions", icon: CreditCardIcon, path: "/admin/subscriptions", current: false },
     { name: "CompanyAdmin", icon: HomeIcon, path: "/admin/companyadmin", current: false },
     { name: "Manager", icon: DocumentTextIcon, path: "/admin/manager", current: false },
