@@ -15,9 +15,11 @@ import {
   Trash2,
   User,
   Users,
+  CheckCircle,
+  XCircle,
+  Shield,
 } from "lucide-react";
 import Sidebar from "./Sidebar";
-import Header from "./Header";
 import axiosInstance from "../../utils/AxiosConfig";
 
 interface Comment {
@@ -39,7 +41,7 @@ interface ProjectManager {
 }
 
 interface ProjectData {
-  _id: string;
+  projectId: string;
   name: string;
   description: string;
   clientName: string;
@@ -56,55 +58,60 @@ interface ProjectData {
 }
 
 const ViewProject: React.FC = () => {
-  const { id } = useParams<{ id: string }>();
+  const { projectId } = useParams<{ projectId: string }>();
   const navigate = useNavigate();
   const [project, setProject] = useState<ProjectData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [newComment, setNewComment] = useState<string>("");
-  const [submittingComment, setSubmittingComment] = useState<boolean>(false);
+  const [userRole, setUserRole] = useState<string>("");
+  const [verifying, setVerifying] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchProjectData = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          toast.error("Authentication required");
-          navigate("manager/login");
-          return;
-        }
-
-        if (!id) {
-          toast.error("Project ID is missing");
-          navigate("/manager/projects");
-          return;
-        }
-
-        const response = await axiosInstance.get(
-          `/project/getallprojects/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+        try {
+          const token = localStorage.getItem("token");
+          if (!token) {
+            toast.error("Authentication required");
+            navigate("/companyAdmin/login");
+            return;
           }
-        );
-
-        if (response.data.success) {
-          setProject(response.data.data);
-        } else {
-          toast.error(response.data.message || "Failed to load project data");
-          navigate("/manager/projects");
+      
+          if (!projectId) {
+            toast.error("Project ID is missing");
+            navigate("/companyAdmin/projects");
+            return;
+          }
+      
+          // Get user role from localStorage
+          const role = localStorage.getItem("role");
+          setUserRole(role || "");
+      
+          // Updated API endpoint to match backend expectation
+          const response = await axiosInstance.get(
+            `/project/getallprojects/${projectId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            }
+          );
+      
+          if (response.data.success) {
+            setProject(response.data.data);
+          } else {
+            toast.error(response.data.message || "Failed to load project data");
+            navigate("/companyAdmin/projects");
+          }
+        } catch (error) {
+          console.error("Error fetching project:", error);
+          toast.error("Failed to load project details");
+          navigate("/companyAdmin/projects");
+        } finally {
+          setLoading(false);
         }
-      } catch (error) {
-        console.error("Error fetching project:", error);
-        toast.error("Failed to load project details");
-        navigate("/manager/projects");
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
     fetchProjectData();
-  }, [id, navigate]);
+  }, [projectId, navigate]);
 
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -115,109 +122,56 @@ const ViewProject: React.FC = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
-  const handleSubmitComment = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!newComment.trim()) {
-      toast.error("Comment cannot be empty");
-      return;
-    }
-
-    setSubmittingComment(true);
-
+  
+  const handleToggleVerification = async () => {
+    if (!project) return;
+    
+    setVerifying(true);
+    
     try {
       const token = localStorage.getItem("token");
       if (!token) {
         toast.error("Authentication required");
-        navigate("/manager/login");
+        navigate("/companyAdmin/login");
         return;
       }
-
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        toast.error("User ID not found. Please log in again.");
-        navigate("/manager/login");
-        return;
-      }
-
-      console.log("Using userId for comment:", userId);
-
-      const response = await axiosInstance.post(
-        `/project/getallprojects/${id}/comments`,
-        {
-          text: newComment,
-          authorId: userId,
-        },
+      
+      const response = await axiosInstance.patch(
+        `/project/projects/${projectId}/toggle-verification`,
+        {}, // Empty request body
         {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
           },
         }
       );
-
+      
       if (response.data.success) {
-        setProject(response.data.data);
-        setNewComment("");
-        toast.success("Comment added successfully");
+        // Only update the specific field that changed instead of replacing the entire object
+        setProject(prevProject => {
+          if (!prevProject) return null;
+          return {
+            ...prevProject,
+            companyAdminIsVerified: !prevProject.companyAdminIsVerified
+          };
+        });
+        toast.success(response.data.message || "Verification status updated successfully");
       } else {
-        toast.error(response.data.message || "Failed to add comment");
+        toast.error(response.data.message || "Failed to update verification status");
       }
     } catch (error: any) {
-      console.error("Error adding comment:", error);
+      console.error("Error toggling verification:", error);
       if (error.response) {
         toast.error(
-          `Failed to add comment: ${
+          `Failed to update verification: ${
             error.response.data.message || error.response.statusText
           }`
         );
       } else {
-        toast.error("Failed to add comment. Please try again.");
+        toast.error("Failed to update verification status. Please try again.");
       }
     } finally {
-      setSubmittingComment(false);
-    }
-  };
-
-  const handleEditProject = () => {
-    navigate(`/manager/projects/${id}/edit`);
-  };
-
-  const handleDeleteProject = async () => {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this project? This action cannot be undone."
-    );
-
-    if (!confirmDelete) {
-      return;
-    }
-
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        toast.error("Authentication required");
-        navigate("/manager/login");
-        return;
-      }
-
-      const response = await axiosInstance.delete(
-        `/project/getallprojects/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.data.success) {
-        toast.success("Project deleted successfully");
-        navigate("/manager/projects");
-      } else {
-        toast.error(response.data.message || "Failed to delete project");
-      }
-    } catch (error) {
-      console.error("Error deleting project:", error);
-      toast.error("Failed to delete project");
+      setVerifying(false);
     }
   };
 
@@ -243,13 +197,13 @@ const ViewProject: React.FC = () => {
       .join(" ");
   };
 
+
+
   return (
     <div className="flex h-screen bg-[#0f121b]">
       <Sidebar />
 
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-
+      <div className="flex-1 flex flex-col overflow-hidden ml-[240px]">
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-[#0f121b] p-6">
           {loading ? (
             <div className="flex justify-center items-center h-full">
@@ -269,20 +223,34 @@ const ViewProject: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex space-x-3">
-                    <button
-                      onClick={handleEditProject}
-                      className="flex items-center space-x-1 bg-blue-700 hover:bg-blue-600 text-white px-4 py-2 rounded-md transition-colors duration-200"
-                    >
-                      <Edit size={16} />
-                      <span>Edit</span>
-                    </button>
-                    <button
-                      onClick={handleDeleteProject}
-                      className="flex items-center space-x-1 bg-red-700 hover:bg-red-600 text-white px-4 py-2 rounded-md transition-colors duration-200"
-                    >
-                      <Trash2 size={16} />
-                      <span>Delete</span>
-                    </button>
+                    
+                      <button
+                        onClick={handleToggleVerification}
+                        disabled={verifying}
+                        className={`flex items-center ${
+                          project.companyAdminIsVerified 
+                            ? "bg-red-600 hover:bg-red-700" 
+                            : "bg-green-600 hover:bg-green-700"
+                        } text-white px-4 py-2 rounded-md transition-colors duration-200 shadow-md`}
+                      >
+                        {verifying ? (
+                          <div className="flex items-center">
+                            <div className="animate-spin h-4 w-4 border-2 border-white rounded-full mr-2"></div>
+                            <span>Processing...</span>
+                          </div>
+                        ) : project.companyAdminIsVerified ? (
+                          <>
+                            <XCircle size={18} className="mr-2" />
+                            <span>Revoke Verification</span>
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle size={18} className="mr-2" />
+                            <span>Verify Project</span>
+                          </>
+                        )}
+                      </button>
+                    
                   </div>
                 </div>
 
@@ -331,7 +299,7 @@ const ViewProject: React.FC = () => {
                   </div>
                   <div className="bg-blue-800/50 p-3 rounded-md">
                     <div className="text-blue-300 text-sm mb-1 flex items-center">
-                      <Users size={14} className="mr-1" />
+                      <Shield size={14} className="mr-1" />
                       Verification Status
                     </div>
                     <div className="flex items-center">
@@ -432,80 +400,6 @@ const ViewProject: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-900 to-indigo-900 px-6 py-4">
-                  <h2 className="text-lg font-semibold text-white flex items-center">
-                    <MessageSquare size={18} className="mr-2" />
-                    Comments & Discussion
-                  </h2>
-                </div>
-
-                <div className="p-6">
-                  <div className="space-y-4 mb-6">
-                    {project.comments && project.comments.length > 0 ? (
-                      project.comments.map((comment) => (
-                        <div
-                          key={comment._id}
-                          className="bg-gray-800 rounded-lg p-4"
-                        >
-                          <div className="flex items-center mb-2">
-                            <div className="w-8 h-8 rounded-full bg-blue-700 flex items-center justify-center text-white font-bold mr-2">
-                              {comment.author.name.charAt(0)}
-                            </div>
-                            <div>
-                              <div className="text-white font-medium">
-                                {comment.author.name}
-                              </div>
-                              <div className="text-gray-400 text-xs">
-                                {new Date(comment.createdAt).toLocaleString()}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-gray-300 ml-10">
-                            {comment.text}
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-center py-6 text-gray-400">
-                        No comments yet. Be the first to add a comment!
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Add Comment Form */}
-                  <form
-                    onSubmit={handleSubmitComment}
-                    className="bg-gray-800 rounded-lg p-4"
-                  >
-                    <h3 className="text-white font-medium mb-3">
-                      Add a Comment
-                    </h3>
-                    <textarea
-                      value={newComment}
-                      onChange={(e) => setNewComment(e.target.value)}
-                      className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 placeholder-gray-400"
-                      placeholder="Type your comment here..."
-                      rows={3}
-                      required
-                    />
-                    <div className="mt-3 flex justify-end">
-                      <button
-                        type="submit"
-                        disabled={submittingComment || !newComment.trim()}
-                        className={`px-4 py-2 rounded-md text-white font-medium ${
-                          submittingComment || !newComment.trim()
-                            ? "bg-gray-600 cursor-not-allowed"
-                            : "bg-blue-600 hover:bg-blue-500 transition-colors duration-200"
-                        }`}
-                      >
-                        {submittingComment ? "Submitting..." : "Add Comment"}
-                      </button>
-                    </div>
-                  </form>
                 </div>
               </div>
             </div>

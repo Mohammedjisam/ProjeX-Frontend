@@ -11,6 +11,8 @@ import Profile from '../components/companyAdmin/Profile';
 import PaymentPage from '../pages/companyAdmin/Stripe';
 import Tenant from '../pages/companyAdmin/Tenant';
 import Subscriptions from '../pages/companyAdmin/Subscriptions';
+import ProjectTable from '../components/companyAdmin/ProjectTable';
+import ViewProject from '../components/companyAdmin/ViewProject';
 
 
 function CompanyAdminRoutes() {
@@ -25,6 +27,9 @@ function CompanyAdminRoutes() {
       <Route path='landing' element={<ProtectedCompanyAdminRoutes><FirstPage/></ProtectedCompanyAdminRoutes>}/>
       <Route path='payment' element={<ProtectedCompanyAdminRoutes><PaymentPage/></ProtectedCompanyAdminRoutes>}/>
       <Route path='profile' element={<ProtectedCompanyAdminRoutes><Profile/></ProtectedCompanyAdminRoutes>}/>
+      <Route path='projects' element={<ProtectedCompanyAdminRoutes><ProjectTable/></ProtectedCompanyAdminRoutes>}/>
+      <Route path='projects/:projectId' element={<ProtectedCompanyAdminRoutes><ViewProject/></ProtectedCompanyAdminRoutes>}/>
+
       <Route path='tenant/:paymentId' element={<ProtectedCompanyAdminRoutes><Tenant/></ProtectedCompanyAdminRoutes>}/>
       <Route path='subscriptions' element={<ProtectedCompanyAdminRoutes><Subscriptions/></ProtectedCompanyAdminRoutes>}/>
 

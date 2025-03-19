@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 import type { RootState } from "../../redux/Store"
 import { logoutCompanyAdmin } from "../../redux/slice/CompanyAdminSlice"
-import { Home, GitBranch, Users, CreditCard, Video, MessageSquare, LogOut, User } from "lucide-react"
+import { Home, GitBranch, Users, CreditCard, Video, MessageSquare, LogOut, User, Folder } from "lucide-react"
 
 interface SidebarItemProps {
   icon: React.ElementType
@@ -59,6 +59,7 @@ const Sidebar: React.FC = () => {
 
       <nav className="mt-3 px-3 flex flex-col gap-1.5 flex-1 overflow-y-auto">
         <SidebarItem icon={Home} label="Home" navigate="/companyadmin/dashboard" />
+        <SidebarItem icon={Folder} label="Projects" navigate="/companyadmin/projects" />
         <SidebarItem icon={GitBranch} label="Branch" navigate="/companyadmin/branch" />
         <SidebarItem icon={Users} label="Managers" navigate="/companyadmin/managers" />
         <SidebarItem icon={CreditCard} label="Subscriptions" navigate="/companyadmin/subscriptions" />

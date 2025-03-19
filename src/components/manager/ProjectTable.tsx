@@ -1,17 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Plus, Loader2 } from 'lucide-react';
-import axiosInstance from '../../utils/AxiosConfig';
-import Header from './Header';
-import Sidebar from './Sidebar';
-import { format } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { Plus, Loader2 } from "lucide-react";
+import axiosInstance from "../../utils/AxiosConfig";
+import Header from "./Header";
+import Sidebar from "./Sidebar";
+import { format } from "date-fns";
+import { useNavigate } from "react-router-dom";
 
 interface Project {
   _id: string;
   name: string;
   clientName: string;
-  status: 'planned' | 'in-progress' | 'completed' | 'on-hold';
+  status: "planned" | "in-progress" | "completed" | "on-hold";
   endDate: string;
+  companyAdminIsVerified: boolean;
 }
 
 export default function ProjectsTable() {
@@ -24,12 +25,12 @@ export default function ProjectsTable() {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get('/project/getallprojects');
+        const response = await axiosInstance.get("/project/getallprojects");
         setProjects(response.data.data);
         setError(null);
       } catch (err: any) {
-        setError(err.response?.data?.message || 'Failed to fetch projects');
-        console.error('Error fetching projects:', err);
+        setError(err.response?.data?.message || "Failed to fetch projects");
+        console.error("Error fetching projects:", err);
       } finally {
         setLoading(false);
       }
@@ -43,34 +44,34 @@ export default function ProjectsTable() {
   };
 
   const handleCreateProject = () => {
-    navigate('/manager/addproject');
+    navigate("/manager/addproject");
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'in-progress':
-      case 'ongoing':
-        return 'text-blue-400';
-      case 'completed':
-        return 'text-green-400';
-      case 'on-hold':
-        return 'text-yellow-400';
-      case 'planned':
-        return 'text-purple-400';
-      case 'closed':
-        return 'text-gray-400';
-      case 'created':
-        return 'text-teal-400';
+      case "in-progress":
+      case "ongoing":
+        return "text-blue-400";
+      case "completed":
+        return "text-green-400";
+      case "on-hold":
+        return "text-yellow-400";
+      case "planned":
+        return "text-purple-400";
+      case "closed":
+        return "text-gray-400";
+      case "created":
+        return "text-teal-400";
       default:
-        return 'text-gray-400';
+        return "text-gray-400";
     }
   };
 
   const formatDate = (dateString: string) => {
     try {
-      return format(new Date(dateString), 'dd/MM/yyyy');
+      return format(new Date(dateString), "dd/MM/yyyy");
     } catch (error) {
-      return 'Invalid date';
+      return "Invalid date";
     }
   };
 
@@ -99,8 +100,8 @@ export default function ProjectsTable() {
             ) : error ? (
               <div className="bg-red-900/30 border border-red-800 text-red-300 p-4 rounded-md">
                 <p>{error}</p>
-                <button 
-                  onClick={() => window.location.reload()} 
+                <button
+                  onClick={() => window.location.reload()}
                   className="mt-2 text-sm text-blue-400 hover:text-blue-300"
                 >
                   Try again
@@ -117,28 +118,52 @@ export default function ProjectsTable() {
                         <th className="py-3 px-4 text-left">Client Name</th>
                         <th className="py-3 px-4 text-left">Status</th>
                         <th className="py-3 px-4 text-left">End Date</th>
+                        <th className="py-3 px-4 text-left">Verified</th>{" "}
+                        {/* New column */}
                         <th className="py-3 px-4 text-center">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-800">
                       {projects.length === 0 ? (
                         <tr>
-                          <td colSpan={6} className="text-center py-8 text-gray-400">
-                            No projects found. Click the 'Add Project' button to create one.
+                          <td
+                            colSpan={7}
+                            className="text-center py-8 text-gray-400"
+                          >
+                            {" "}
+                            {/* Update colspan to 7 */}
+                            No projects found. Click the 'Add Project' button to
+                            create one.
                           </td>
                         </tr>
                       ) : (
                         projects.map((project, index) => (
-                          <tr key={project._id} className="hover:bg-gray-800/50 transition-colors">
+                          <tr
+                            key={project._id}
+                            className="hover:bg-gray-800/50 transition-colors"
+                          >
                             <td className="py-4 px-4">{index + 1}</td>
                             <td className="py-4 px-4">{project.name}</td>
                             <td className="py-4 px-4">{project.clientName}</td>
                             <td className="py-4 px-4">
-                              <span className={`capitalize ${getStatusColor(project.status)}`}>
+                              <span
+                                className={`capitalize ${getStatusColor(
+                                  project.status
+                                )}`}
+                              >
                                 {project.status}
                               </span>
                             </td>
-                            <td className="py-4 px-4">{formatDate(project.endDate)}</td>
+                            <td className="py-4 px-4">
+                              {formatDate(project.endDate)}
+                            </td>
+                            <td className="py-4 px-4">
+                              {project.companyAdminIsVerified ? (
+                                <span className="text-green-400">Verified</span>
+                              ) : (
+                                <span className="text-yellow-400">Pending</span>
+                              )}
+                            </td>
                             <td className="py-4 px-4 text-center">
                               <button
                                 onClick={() => handleViewDetails(project._id)}
