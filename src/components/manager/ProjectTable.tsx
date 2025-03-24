@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Plus, Loader2 } from "lucide-react";
-import axiosInstance from "../../utils/AxiosConfig";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import managerAxiosInstance from "../../utils/ManagerAxiosInstance";
 
 interface Project {
   _id: string;
@@ -25,7 +25,7 @@ export default function ProjectsTable() {
     const fetchProjects = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get("/project/getallprojects");
+        const response = await managerAxiosInstance.get("/project/getallprojects");
         setProjects(response.data.data);
         setError(null);
       } catch (err: any) {

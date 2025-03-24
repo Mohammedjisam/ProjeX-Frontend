@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react"
 import { useSelector } from "react-redux"
 import { DragDropContext, Droppable, Draggable, type DropResult } from "react-beautiful-dnd"
-import axiosInstance from "../../utils/AxiosConfig"
 import { Calendar, Clock, AlertTriangle } from "lucide-react"
 import { Badge } from "../../components/ui/badge"
 import { Card, CardContent } from "../../components/ui/card"
@@ -12,6 +11,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar"
 import { Button } from "../../components/ui/button"
 import Sidebar from "./Sidebar"
 import { useNavigate } from "react-router-dom" // Add this import at the top
+import developerAxiosInstance from "../../utils/DeveloperAxiosInstance"
 
 
 // Define task interface
@@ -89,7 +89,7 @@ const TaskBoard = () => {
       console.log("Developer data", developerData)
 
       // Use the new developer endpoint
-      const response = await axiosInstance.post(`/task/developer`, { developerId: developerData.id })
+      const response = await developerAxiosInstance.post(`/task/developer`, { developerId: developerData.id })
 
       // Get all tasks from the response
       const allTasks = response.data.data
@@ -121,7 +121,7 @@ const TaskBoard = () => {
   // Update task status
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     try {
-      await axiosInstance.post("/task/updatestatus", {
+      await developerAxiosInstance.post("/task/updatestatus", {
         taskId,
         status: newStatus,
       })

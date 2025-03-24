@@ -11,7 +11,7 @@ const ProtectedCompanyAdminLogin: React.FC<Props> = ({ children }) => {
   const companyAdminData = useSelector((state: RootState) => state.companyAdmin.companyAdminData);
 
   if (companyAdminData) {
-    return <Navigate to="/companyadmin/dashboard" />;
+    return <Navigate to="/companyadmin/landing" />;
   }
   return children;
 };

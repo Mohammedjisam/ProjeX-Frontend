@@ -1,243 +1,131 @@
-"use client"
-import type React from "react"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup"
-import { useNavigate } from "react-router-dom"
-import { Button } from "../../components/ui/button"
-import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
-import { AlertCircle, Mail, Lock, Eye, EyeOff } from "lucide-react"
-import { Alert, AlertDescription } from "../../components/ui/alert"
-import { Separator } from "../../components/ui/separator"
-import { GoogleLogin } from "@react-oauth/google"
-import axiosInstance from "../../utils/AxiosConfig"
-import { toast } from "sonner"
+// src/pages/companyadmin/CompanyAdminLogin.tsx
+import React from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
+import { ILoginData } from "../../types/User";
+import { 
+  useCompanyAdminLoginMutation, 
+  useCompanyAdminGoogleLoginMutation 
+} from "../../hooks/useLogin";
+import SignIn from "../../components/auth/CompanyAdminSignIn";
 
-interface LoginFormInputs {
-  email: string
-  password: string
-}
+const CompanyAdminLogin = () => {
+  const navigate = useNavigate();
+  
+  const { 
+    mutate: loginCompanyAdmin, 
+    isPending: isLoginPending, 
+    error: loginError 
+  } = useCompanyAdminLoginMutation();
+  
+  const { 
+    mutate: googleLoginCompanyAdmin, 
+    isPending: isGoogleLoginPending 
+  } = useCompanyAdminGoogleLoginMutation();
 
-const loginSchema = yup.object({
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup.string().required("Password is required"),
-})
-
-const CompanyAdminLogin: React.FC = () => {
-  const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [error, setError] = useState<string>("")
-  const [loading, setLoading] = useState(false)
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormInputs>({
-    resolver: yupResolver(loginSchema),
-  })
-
-  const onSubmit = async (data: LoginFormInputs) => {
-    try {
-      setError("")
-
-      const response = await axiosInstance.post(
-        "/auth/login",
-        {
-          email: data.email,
-          password: data.password,
-          role: "companyAdmin", 
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      )
-
-      if (response.data.success) {
-        toast.success("Login successful! Redirecting to dashboard...", {
-          style: {
-            backgroundColor: "#10B981",
-            color: "white",
-          },
-        })
-        
-        localStorage.setItem("token", response.data.token)
-        localStorage.setItem("companyAdminData", JSON.stringify(response.data.user))
-
-        navigate("/companyadmin/dashboard")
+  const handleLoginSubmit = (data: ILoginData) => {
+    loginCompanyAdmin(data, {
+      onSuccess: (response) => {
+        if (response?.success) {
+          localStorage.setItem("token", response.token);
+          localStorage.setItem("companyAdminData", JSON.stringify(response.user));
+          
+          toast.success("Login successful!", {
+            style: { 
+              backgroundColor: "#34D399", 
+              color: "white" 
+            },
+            duration: 1500,
+            onAutoClose: () => {
+              navigate("/companyadmin/dashboard", { replace: true });
+            }
+          });
+        } else {
+          toast.error(response?.message || "Login failed");
+        }
+      },
+      onError: (error: any) => {
+        const errorMessage = error.response?.data?.message || "Login failed";
+        toast.error(errorMessage, {
+          style: { 
+            backgroundColor: "#EF4444", 
+            color: "white" 
+          }
+        });
       }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "An error occurred during login"
-      setError(errorMessage)
-      
-      toast.error(errorMessage, {
-        style: {
-          backgroundColor: "#EF4444",
-          color: "white",
-        },
-      })
+    });
+  };
+
+  const handleGoogleLoginSuccess = (credentialResponse: any) => {
+    if (!credentialResponse?.credential) {
+      toast.error("Google authentication failed");
+      return;
     }
-  }
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword)
-  }
-
-  const handleGoogleLoginSuccess = async (credentialResponse: any) => {
-    try {
-      setLoading(true)
-      setError("")
-
-      console.log("Google login response:", credentialResponse)
-
-      const response = await axiosInstance.post("/auth/google/token", {
-        credential: credentialResponse.credential,
-        role: "companyAdmin", 
-      })
-
-      console.log("Google authentication successful:", response.data)
-
-      toast.success("Google login successful! Redirecting to dashboard...", {
-        style: {
-          backgroundColor: "#10B981",
-          color: "white",
-        },
-      })
-
-      localStorage.setItem("token", response.data.token)
-      localStorage.setItem("companyAdminData", JSON.stringify(response.data.user))
-
-      navigate("/companyadmin/dashboard")
-    } catch (err: any) {
-      console.error("Google login error:", err)
-      const errorMessage = err.response?.data?.message || "Google authentication failed"
-      setError(errorMessage)
-      
-      toast.error(errorMessage, {
-        style: {
-          backgroundColor: "#EF4444",
-          color: "white",
-        },
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
+    googleLoginCompanyAdmin(credentialResponse.credential, {
+      onSuccess: (response) => {
+        if (response?.success) {
+          localStorage.setItem("token", response.token);
+          localStorage.setItem("companyAdminData", JSON.stringify(response.user));
+          
+          toast.success("Google login successful!", {
+            style: { 
+              backgroundColor: "#34D399", 
+              color: "white" 
+            },
+            duration: 1500,
+            onAutoClose: () => {
+              navigate("/companyadmin/dashboard", { replace: true });
+            }
+          });
+        } else {
+          toast.error(response?.message || "Google login failed");
+        }
+      },
+      onError: (error: any) => {
+        const errorMessage = error.response?.data?.message || "Google authentication failed";
+        toast.error(errorMessage, {
+          style: { 
+            backgroundColor: "#EF4444", 
+            color: "white" 
+          }
+        });
+      }
+    });
+  };
 
   const handleGoogleLoginError = () => {
-    const errorMessage = "Google login failed. Please try again."
-    setError(errorMessage)
-    
-    toast.error(errorMessage, {
-      style: {
-        backgroundColor: "#EF4444",
-        color: "white",
-      },
-    })
-  }
+    toast.error("Google login failed. Please try again.", {
+      style: { 
+        backgroundColor: "#EF4444", 
+        color: "white" 
+      }
+    });
+  };
 
+  const errorMessage = (loginError as any)?.response?.data?.message || "";
 
   return (
-    <div className="min-h-screen  py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
-          <CardDescription className="text-center">Sign in to your Project Manager account</CardDescription>
-        </CardHeader>
+    <AnimatePresence mode="wait">
+      <motion.div
+        key="login"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.5 }}
+      >
+        <SignIn
+          userType="Company Admin"
+          onSubmit={handleLoginSubmit}
+          isLoading={isLoginPending || isGoogleLoginPending}
+          error={errorMessage}
+          onGoogleSuccess={handleGoogleLoginSuccess}
+          onGoogleError={handleGoogleLoginError}
+        />
+      </motion.div>
+    </AnimatePresence>
+  );
+};
 
-        {error && (
-          <div className="px-6">
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          </div>
-        )}
-
-        <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input id="email" type="email" className="pl-10" placeholder="you@example.com" {...register("email")} />
-              </div>
-              {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="password">Password</Label>
-                <a href="/forgot-password" className="text-xs text-primary hover:underline">
-                  Forgot password?
-                </a>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  className="pl-10 pr-10"
-                  placeholder="Enter your password"
-                  {...register("password")}
-                />
-                <button
-                  type="button"
-                  onClick={togglePasswordVisibility}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-500 focus:outline-none"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
-            </div>
-
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? "Signing in..." : "Sign in"}
-            </Button>
-          </form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <Separator />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-            </div>
-          </div>
-
-          <div className="flex justify-center">
-            <GoogleLogin
-              onSuccess={handleGoogleLoginSuccess}
-              onError={handleGoogleLoginError}
-              useOneTap
-              logo_alignment="center"
-              text="continue_with"
-              shape="rectangular"
-            />
-          </div>
-        </CardContent>
-
-        <CardFooter className="flex justify-center">
-          <p className="text-sm text-muted-foreground">
-            Don't have an account?{" "}
-            <span
-              className="font-medium text-primary hover:underline cursor-pointer"
-              onClick={() => navigate("/companyadmin/signup")}
-            >
-              Sign up
-            </span>
-          </p>
-        </CardFooter>
-      </Card>
-    </div>
-  )
-}
-
-export default CompanyAdminLogin
-
+export default CompanyAdminLogin;

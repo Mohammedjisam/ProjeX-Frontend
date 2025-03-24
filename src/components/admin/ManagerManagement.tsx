@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from "../../utils/AxiosConfig";
 import { Sidebar } from "./Sidebar";
 import { Search, RefreshCw, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import adminAxiosInstance from "../../utils/AdminAxiosInstance";
 
 // Types
 interface Manager {
@@ -31,7 +31,7 @@ const ManagerManagement: React.FC = () => {
     try {
       setLoading(true);
       
-      const response = await axiosInstance.get("/admin/manager");
+      const response = await adminAxiosInstance.get("/manager");
       
       setManagers(response.data.data);
       setError(null);
@@ -47,7 +47,7 @@ const ManagerManagement: React.FC = () => {
 
   const handleToggleStatus = async (id: string) => {
     try {
-      await axiosInstance.patch(`/admin/manager/${id}/togglestatus`);
+      await adminAxiosInstance.patch(`/manager/${id}/togglestatus`);
       
       // Update local state to reflect the change
       setManagers(prevManagers =>
@@ -67,7 +67,7 @@ const ManagerManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this manager?")) {
       try {
-        await axiosInstance.delete(`/admin/manager/${id}`);
+        await adminAxiosInstance.delete(`/manager/${id}`);
         
         // Remove deleted manager from state
         setManagers(prevManagers => prevManagers.filter(manager => manager._id !== id));

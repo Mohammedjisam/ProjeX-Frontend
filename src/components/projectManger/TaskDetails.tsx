@@ -19,7 +19,6 @@ import {
   Flag,
 } from "lucide-react";
 import { format } from "date-fns";
-import axiosInstance from "../../utils/AxiosConfig";
 import Sidebar from "./Sidebar";
 import { Button } from "../../components/ui/button";
 import {
@@ -43,6 +42,7 @@ import {
   AvatarImage,
 } from "../../components/ui/avatar";
 import { Skeleton } from "../../components/ui/skeleton";
+import taskAxiosInstance from "../../utils/TaskAxiosInstance";
 
 interface TaskDetails {
   _id: string;
@@ -94,7 +94,7 @@ const TaskDetails: React.FC = () => {
         setError(null);
         console.log("Fetching task with ID:", taskId);
 
-        const response = await axiosInstance.get(`/task/${taskId}`);
+        const response = await taskAxiosInstance.get(`/${taskId}`);
         
         console.log("API Response:", response.data);
 

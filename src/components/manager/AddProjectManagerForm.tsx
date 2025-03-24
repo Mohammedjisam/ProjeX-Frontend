@@ -6,7 +6,7 @@ import { motion } from "framer-motion"
 import { toast } from "sonner"
 import { UserPlus, Mail, Phone, Save, X } from "lucide-react"
 import axios from "axios"
-import axiosInstance from "../../utils/AxiosConfig"
+import managerAxiosInstance from "../../utils/ManagerAxiosInstance"
 
 interface FormData {
   name: string
@@ -71,7 +71,7 @@ const AddProjectManagerForm: React.FC<AddProjectManagerFormProps> = ({ onSuccess
     setLoading(true)
 
     try {
-      const response = await axiosInstance.post("/manager/addnewprojectmanager", formData)
+      const response = await managerAxiosInstance.post("/addnewprojectmanager", formData)
 
       if (response.data.success) {
         toast.success(" Project Manager added successfully. Password setup email sent.")

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import axios from 'axios';
-import axiosInstance from '../../utils/AxiosConfig';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
+import managerAxiosInstance from '../../utils/ManagerAxiosInstance';
 
 interface ProjectManager {
   _id: string;
@@ -28,7 +28,7 @@ const ProjectManagersTable: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axiosInstance.get('/manager/getallprojectmanager');
+      const response = await managerAxiosInstance.get('/getallprojectmanager');
 
       if (response.data && response.data.data) {
         setProjectManagers(response.data.data);
@@ -66,7 +66,7 @@ const ProjectManagersTable: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await axiosInstance.delete(`/manager/getallprojectmanager/${id}`);
+      await managerAxiosInstance.delete(`/getallprojectmanager/${id}`);
 
       setProjectManagers(projectManagers.filter(pm => pm._id !== id));
       toast.success('Project Manager deleted successfully');

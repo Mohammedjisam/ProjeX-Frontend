@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Loader2, ArrowLeft, CheckCircle, XCircle } from "lucide-react";
-import axiosInstance from "../../utils/AxiosConfig";
 import { Sidebar } from "./Sidebar";
+import adminAxiosInstance from "../../utils/AdminAxiosInstance";
 
 interface Company {
   _id: string;
@@ -22,36 +22,71 @@ interface Company {
     _id: string;
     name: string;
     email: string;
-  };
+  } | null;
   adminVerification: boolean;
   payment: {
     _id: string;
     planId: string;
+    companyAdmin: string;
     subscriptionStatus: 'active' | 'past_due' | 'canceled' | 'trialing' | 'incomplete';
     currentPeriodEnd: string;
     maxBranches: number;
     maxUsers: number;
     maxMeetingParticipants: number;
-  };
+  } | null;
+}
+
+interface AdminUser {
+  _id: string;
+  name: string;
+  email: string;
 }
 
 export default function ViewCompany() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [company, setCompany] = useState<Company | null>(null);
+  const [adminUser, setAdminUser] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updating, setUpdating] = useState(false);
   const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
+  const [loadingAdmin, setLoadingAdmin] = useState(false);
 
   useEffect(() => {
-    fetchCompanyDetails();
+    if (id) {
+      fetchCompanyDetails();
+    }
   }, [id]);
 
+  useEffect(() => {
+    // If company data is loaded and payment contains admin ID but companyAdmin is null
+    if (company && !company.companyAdmin && company.payment?.companyAdmin) {
+      fetchAdminDetails(company.payment.companyAdmin);
+    }
+  }, [company]);
+
+  const fetchAdminDetails = async (adminId: string) => {
+    try {
+      setLoadingAdmin(true);
+      const response = await adminAxiosInstance.get(`/user/${adminId}`);
+      if (response.data.success) {
+        setAdminUser(response.data.data);
+      }
+    } catch (err: any) {
+      console.error("Error fetching admin details:", err);
+      // Not setting global error since this is a secondary operation
+    } finally {
+      setLoadingAdmin(false);
+    }
+  };
+
   const fetchCompanyDetails = async () => {
+    if (!id) return;
+    
     try {
       setLoading(true);
-      const response = await axiosInstance.get(`/company/${id}`);
+      const response = await adminAxiosInstance.get(`/company/${id}`);
       
       if (response.data.success) {
         console.log('Company data received:', response.data.data);
@@ -70,17 +105,24 @@ export default function ViewCompany() {
   };
 
   const toggleVerification = async () => {
-    if (!company) return;
+    if (!company || !id) return;
     
     try {
       setUpdating(true);
-      const response = await axiosInstance.patch(`/company/${id}/toggle-verification`);
+      const response = await adminAxiosInstance.patch(`/company/${id}/toggle-verification`);
       
       if (response.data.success) {
-        setCompany(response.data.data);
-        setUpdateSuccess(response.data.message);
+        // Create a new company object with the updated data
+        const updatedCompany = {
+          ...company,
+          adminVerification: !company.adminVerification
+        };
         
-        // Clear success message after 3 seconds
+        // Update the state with the new company object
+        setCompany(updatedCompany);
+        setUpdateSuccess(response.data.message || 
+          `Admin verification ${updatedCompany.adminVerification ? 'enabled' : 'disabled'} successfully`);
+        
         setTimeout(() => {
           setUpdateSuccess(null);
         }, 3000);
@@ -90,17 +132,21 @@ export default function ViewCompany() {
     } catch (err: any) {
       setError(err.response?.data?.message || err.message || "Failed to update verification status");
       console.error("Error updating verification status:", err);
+      
+      // Clear the error after 3 seconds
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
     } finally {
       setUpdating(false);
     }
   };
 
-  // Helper function to format date
   const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString();
   };
 
-  // Helper function to get plan name with proper capitalization
   const getPlanName = (planId: string) => {
     switch (planId) {
       case 'basic':
@@ -110,12 +156,11 @@ export default function ViewCompany() {
       case 'business':
         return 'Business';
       default:
-        return planId.charAt(0).toUpperCase() + planId.slice(1);
+        return planId ? planId.charAt(0).toUpperCase() + planId.slice(1) : 'No Plan';
     }
   };
 
-  // Helper function to get status badge style
-  const getStatusBadgeStyle = (status: string) => {
+  const getStatusBadgeStyle = (status: string = '') => {
     switch (status) {
       case 'active':
         return 'bg-green-900/50 text-green-400 border-green-800';
@@ -129,6 +174,14 @@ export default function ViewCompany() {
       default:
         return 'bg-gray-900/50 text-gray-400 border-gray-800';
     }
+  };
+
+  // Get admin details from either company.companyAdmin or the fetched adminUser
+  const getAdminDetails = () => {
+    if (company?.companyAdmin) {
+      return company.companyAdmin;
+    }
+    return adminUser;
   };
 
   return (
@@ -177,7 +230,7 @@ export default function ViewCompany() {
                   </div>
                   <div className="flex items-center">
                     <span className="text-gray-300 mr-3">Verification Status:</span>
-                    <div className="flex items-center">
+                    <div className="flex items-center mr-4">
                       {company.adminVerification ? (
                         <span className="flex items-center text-green-400">
                           <CheckCircle className="h-5 w-5 mr-1" />
@@ -190,6 +243,30 @@ export default function ViewCompany() {
                         </span>
                       )}
                     </div>
+                    <button
+                      onClick={toggleVerification}
+                      disabled={updating}
+                      className={`px-3 py-1 rounded-md flex items-center text-sm ${
+                        company.adminVerification
+                          ? "bg-yellow-600 hover:bg-yellow-700"
+                          : "bg-green-600 hover:bg-green-700"
+                      } ${
+                        updating ? "opacity-50 cursor-not-allowed" : ""
+                      } text-white transition-colors`}
+                    >
+                      {updating ? (
+                        <Loader2 className="h-4 w-4 mr-1 animate-spin" />
+                      ) : company.adminVerification ? (
+                        <XCircle className="h-4 w-4 mr-1" />
+                      ) : (
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                      )}
+                      {updating
+                        ? "Processing..."
+                        : company.adminVerification
+                        ? "Revoke Verification"
+                        : "Verify Company"}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -228,36 +305,40 @@ export default function ViewCompany() {
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-white mb-4">Address</h3>
                   <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-gray-400 text-sm">Building No</p>
-                        <p className="text-white">{company.address.buildingNo}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400 text-sm">Street</p>
-                        <p className="text-white">{company.address.street}</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-gray-400 text-sm">City</p>
-                        <p className="text-white">{company.address.city}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400 text-sm">State</p>
-                        <p className="text-white">{company.address.state}</p>
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-gray-400 text-sm">Country</p>
-                        <p className="text-white">{company.address.country}</p>
-                      </div>
-                      <div>
-                        <p className="text-gray-400 text-sm">Postal Code</p>
-                        <p className="text-white">{company.address.postalCode}</p>
-                      </div>
-                    </div>
+                    {company.address && (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-gray-400 text-sm">Building No</p>
+                            <p className="text-white">{company.address.buildingNo}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400 text-sm">Street</p>
+                            <p className="text-white">{company.address.street}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-gray-400 text-sm">City</p>
+                            <p className="text-white">{company.address.city}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400 text-sm">State</p>
+                            <p className="text-white">{company.address.state}</p>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-gray-400 text-sm">Country</p>
+                            <p className="text-white">{company.address.country}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400 text-sm">Postal Code</p>
+                            <p className="text-white">{company.address.postalCode}</p>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
@@ -266,14 +347,30 @@ export default function ViewCompany() {
                 <div className="p-6">
                   <h3 className="text-lg font-semibold text-white mb-4">Company Admin</h3>
                   <div className="space-y-4">
-                    <div>
-                      <p className="text-gray-400 text-sm">Name</p>
-                      <p className="text-white">{company.companyAdmin.name}</p>
-                    </div>
-                    <div>
-                      <p className="text-gray-400 text-sm">Email</p>
-                      <p className="text-white">{company.companyAdmin.email}</p>
-                    </div>
+                    {getAdminDetails() ? (
+                      <>
+                        <div>
+                          <p className="text-gray-400 text-sm">Name</p>
+                          <p className="text-white">{getAdminDetails()?.name}</p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400 text-sm">Email</p>
+                          <p className="text-white">{getAdminDetails()?.email}</p>
+                        </div>
+                      </>
+                    ) : loadingAdmin ? (
+                      <div className="flex justify-center items-center py-4">
+                        <Loader2 className="h-6 w-6 text-blue-500 animate-spin" />
+                      </div>
+                    ) : company.payment?.companyAdmin ? (
+                      <div className="bg-blue-900/30 border border-blue-800 text-blue-300 p-4 rounded-md">
+                        <p>Admin details could not be loaded. Please refresh to try again.</p>
+                      </div>
+                    ) : (
+                      <div className="bg-yellow-900/30 border border-yellow-800 text-yellow-300 p-4 rounded-md">
+                        <p>No admin assigned to this company.</p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -321,44 +418,13 @@ export default function ViewCompany() {
                       </div>
                     </div>
                   ) : (
-                    <p className="text-gray-400">No subscription information available</p>
+                    <div className="bg-yellow-900/30 border border-yellow-800 text-yellow-300 p-4 rounded-md">
+                      <p>No subscription plan is active. The company needs to set up a payment plan.</p>
+                    </div>
                   )}
                 </div>
               </div>
             </div>
-
-            <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden">
-  <div className="p-6">
-    <h3 className="text-lg font-semibold text-white mb-4">Actions</h3>
-    <div className="flex items-center">
-      <button
-        onClick={toggleVerification}
-        disabled={updating}
-        className={`px-4 py-2 rounded-md flex items-center ${
-          company.adminVerification
-            ? "bg-yellow-600 hover:bg-yellow-700"
-            : "bg-green-600 hover:bg-green-700"
-        } ${
-          updating ? "opacity-50 cursor-not-allowed" : ""
-        } text-white transition-colors`}
-      >
-        {updating ? (
-          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-        ) : company.adminVerification ? (
-          <XCircle className="h-4 w-4 mr-2" />
-        ) : (
-          <CheckCircle className="h-4 w-4 mr-2" />
-        )}
-        {updating
-          ? "Processing..."
-          : company.adminVerification
-          ? "Revoke Verification"
-          : "Verify Company"}
-      </button>
-    </div>
-  </div>
-</div>
-            
           </div>
         ) : (
           <div className="bg-gray-800 p-6 rounded-lg text-center text-gray-400">

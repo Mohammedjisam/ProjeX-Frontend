@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import axios from 'axios';
-import axiosInstance from '../../utils/AxiosConfig';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
+import managerAxiosInstance from '../../utils/ManagerAxiosInstance';
 
 interface Developer {
   _id: string;
@@ -28,7 +28,7 @@ const DevelopersTable: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axiosInstance.get('/manager/getalldeveloper');
+      const response = await managerAxiosInstance.get('/getalldeveloper');
 
       if (response.data && response.data.data) {
         setDevelopers(response.data.data);
@@ -66,7 +66,7 @@ const DevelopersTable: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await axiosInstance.delete(`/manager/getalldeveloper/${id}`);
+      await managerAxiosInstance.delete(`/getalldeveloper/${id}`);
 
       setDevelopers(developers.filter(dev => dev._id !== id));
       toast.success('Developer deleted successfully');

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from "../../utils/AxiosConfig";
 import { Sidebar } from "./Sidebar";
 import { Search, RefreshCw, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import adminAxiosInstance from "../../utils/AdminAxiosInstance";
 
 // Types
 interface ProjectManager {
@@ -31,7 +31,7 @@ const ProjectManagerManagement: React.FC = () => {
     try {
       setLoading(true);
       
-      const response = await axiosInstance.get("/admin/projectmanager");
+      const response = await adminAxiosInstance.get("/projectmanager");
       
       setProjectManagers(response.data.data);
       setError(null);
@@ -47,7 +47,7 @@ const ProjectManagerManagement: React.FC = () => {
 
   const handleToggleStatus = async (id: string) => {
     try {
-      await axiosInstance.patch(`/admin/projectmanager/${id}/togglestatus`);
+      await adminAxiosInstance.patch(`/projectmanager/${id}/togglestatus`);
       
       // Update local state to reflect the change
       setProjectManagers(prevManagers =>
@@ -67,7 +67,7 @@ const ProjectManagerManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this project manager?")) {
       try {
-        await axiosInstance.delete(`/admin/projectmanager/${id}`);
+        await adminAxiosInstance.delete(`/projectmanager/${id}`);
         
         // Remove deleted project manager from state
         setProjectManagers(prevManagers => prevManagers.filter(manager => manager._id !== id));

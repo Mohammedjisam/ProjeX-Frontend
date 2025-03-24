@@ -3,10 +3,10 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { format } from "date-fns"
-import axiosInstance from "../../utils/AxiosConfig"
 import { PlusIcon } from "@heroicons/react/24/outline"
 import { useParams, useNavigate } from "react-router-dom"
 import Sidebar from "./Sidebar"
+import taskAxiosInstance from "../../utils/TaskAxiosInstance"
 
 // Task interface based on your MongoDB model
 interface ITask {
@@ -45,7 +45,7 @@ const TaskTable: React.FC = () => {
       try {
         setLoading(true)
         console.log("project id ", id)
-        const response = await axiosInstance.get(`/task/project/${id}`)
+        const response = await taskAxiosInstance.get(`/project/${id}`)
 
         if (response.data.success) {
           setTasks(response.data.data || [])
@@ -71,7 +71,7 @@ const TaskTable: React.FC = () => {
   const handleDelete = async (taskId: string) => {
     if (window.confirm("Are you sure you want to delete this task?")) {
       try {
-        const response = await axiosInstance.delete(`/task/${taskId}`)
+        const response = await taskAxiosInstance.delete(`/${taskId}`)
 
         if (response.data.success) {
           // Remove the deleted task from the state

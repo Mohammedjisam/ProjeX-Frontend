@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import {Loader2, Filter, ChevronDown } from "lucide-react";
-import axiosInstance from "../../utils/AxiosConfig";
 import { format } from "date-fns";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
+import companyadminAxiosInstance from "../../utils/CompanyAdminAxiosInstance";
 
 interface Project {
   _id: string;
@@ -59,7 +59,7 @@ export default function ProjectTable() {
       if (filters.startDateTo) queryParams.append("startDateTo", filters.startDateTo);
       if (filters.verified) queryParams.append("verified", filters.verified);
 
-      const response = await axiosInstance.get(`/project/getallprojects?${queryParams.toString()}`);
+      const response = await companyadminAxiosInstance.get(`/project/getallprojects?${queryParams.toString()}`);
       setProjects(response.data.data);
       setTotalPages(response.data.pagination.pages);
       setError(null);

@@ -20,7 +20,7 @@ import {
   Shield,
 } from "lucide-react";
 import Sidebar from "./Sidebar";
-import axiosInstance from "../../utils/AxiosConfig";
+import companyadminAxiosInstance from "../../utils/CompanyAdminAxiosInstance";
 
 interface Comment {
   _id: string;
@@ -86,7 +86,7 @@ const ViewProject: React.FC = () => {
           setUserRole(role || "");
       
           // Updated API endpoint to match backend expectation
-          const response = await axiosInstance.get(
+          const response = await companyadminAxiosInstance.get(
             `/project/getallprojects/${projectId}`,
             {
               headers: {
@@ -136,7 +136,7 @@ const ViewProject: React.FC = () => {
         return;
       }
       
-      const response = await axiosInstance.patch(
+      const response = await companyadminAxiosInstance.patch(
         `/project/projects/${projectId}/toggle-verification`,
         {}, // Empty request body
         {

@@ -18,7 +18,7 @@ import {
 } from "lucide-react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
-import axiosInstance from "../../utils/AxiosConfig";
+import managerAxiosInstance from "../../utils/ManagerAxiosInstance";
 
 interface Comment {
   _id: string;
@@ -79,7 +79,7 @@ const ViewProject: React.FC = () => {
           return;
         }
 
-        const response = await axiosInstance.get(
+        const response = await managerAxiosInstance.get(
           `/project/getallprojects/${id}`,
           {
             headers: {
@@ -142,7 +142,7 @@ const ViewProject: React.FC = () => {
 
       console.log("Using userId for comment:", userId);
 
-      const response = await axiosInstance.post(
+      const response = await managerAxiosInstance.post(
         `/project/getallprojects/${id}/comments`,
         {
           text: newComment,
@@ -200,7 +200,7 @@ const ViewProject: React.FC = () => {
         return;
       }
 
-      const response = await axiosInstance.delete(
+      const response = await managerAxiosInstance.delete(
         `/project/getallprojects/${id}`,
         {
           headers: {

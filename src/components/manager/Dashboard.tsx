@@ -3,7 +3,7 @@ import { cn } from "../../lib/utils";
 import { useState, useEffect } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
-import axiosInstance from "../../utils/AxiosConfig"; // Update this path
+import managerAxiosInstance from "../../utils/ManagerAxiosInstance";
 
 export function Dashboard() {
   // Animation states
@@ -22,7 +22,7 @@ export function Dashboard() {
     try {
       setLoading(true);
       // Fetch all projects
-      const response = await axiosInstance.get("/project/getallprojects");
+      const response = await managerAxiosInstance.get("/project/getallprojects");
       
       if (response.data.success) {
         const allProjects = response.data.data;

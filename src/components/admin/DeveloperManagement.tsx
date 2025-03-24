@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from "../../utils/AxiosConfig";
 import { Sidebar } from "./Sidebar";
 import { Search, RefreshCw, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import adminAxiosInstance from "../../utils/AdminAxiosInstance";
 
 // Types
 interface Developer {
@@ -31,7 +31,7 @@ const DeveloperManagement: React.FC = () => {
     try {
       setLoading(true);
       
-      const response = await axiosInstance.get("/admin/developer");
+      const response = await adminAxiosInstance.get("/developer");
       
       setDevelopers(response.data.data);
       setError(null);
@@ -47,7 +47,7 @@ const DeveloperManagement: React.FC = () => {
 
   const handleToggleStatus = async (id: string) => {
     try {
-      await axiosInstance.patch(`/admin/developer/${id}/togglestatus`);
+      await adminAxiosInstance.patch(`/developer/${id}/togglestatus`);
       
       // Update local state to reflect the change
       setDevelopers(prevDevelopers =>
@@ -67,7 +67,7 @@ const DeveloperManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this developer?")) {
       try {
-        await axiosInstance.delete(`/admin/developer/${id}`);
+        await adminAxiosInstance.delete(`/developer/${id}`);
         
         // Remove deleted developer from state
         setDevelopers(prevDevelopers => prevDevelopers.filter(developer => developer._id !== id));

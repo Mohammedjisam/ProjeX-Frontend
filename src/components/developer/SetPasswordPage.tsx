@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Lock, Eye, EyeOff, Check } from 'lucide-react';
 import axios from 'axios';
-import axiosInstance from '../../utils/AxiosConfig';
+import developerAxiosInstance from '../../utils/DeveloperAxiosInstance';
 const SetPasswordPage: React.FC = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
@@ -27,7 +27,7 @@ const SetPasswordPage: React.FC = () => {
         return;
       }
       try {
-        const response = await axiosInstance.get(`/password/validate-token/${token}`);
+        const response = await developerAxiosInstance.get(`/password/validate-token/${token}`);
         if (response.data.success) {
           setIsTokenValid(true);
           setUserData(response.data.data);
@@ -62,7 +62,7 @@ const SetPasswordPage: React.FC = () => {
     }
     setSubmitting(true);
     try {
-      const response = await axiosInstance.post(`/password/reset/${token}`, {
+      const response = await developerAxiosInstance.post(`/password/reset/${token}`, {
         password,
       });
       if (response.data.success) {

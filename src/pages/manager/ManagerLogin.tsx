@@ -1,250 +1,106 @@
-"use client"
-
-import type React from "react"
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { yupResolver } from "@hookform/resolvers/yup"
-import * as yup from "yup"
-import { useNavigate } from "react-router-dom"
-import { Button } from "../../components/ui/button"
-import { Input } from "../../components/ui/input"
-import { Label } from "../../components/ui/label"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card"
-import { AlertCircle, Mail, Lock, Eye, EyeOff } from "lucide-react"
-import { Alert, AlertDescription } from "../../components/ui/alert"
-import { Separator } from "../../components/ui/separator"
-import { GoogleLogin } from "@react-oauth/google"
-import { motion } from "framer-motion"
-import axiosInstance from "../../utils/AxiosConfig"
+// src/pages/manager/ManagerLogin.tsx
+import React from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { ILoginData } from "../../types/User";
+import { useManagerLoginMutation, useManagerGoogleLoginMutation } from "../../hooks/useLogin";
+import SignIn from "../../components/auth/ManagerSignIn";
 
-interface LoginFormInputs {
-  email: string
-  password: string
-  rememberMe?: boolean
-}
+const ManagerLogin = () => {
+  const navigate = useNavigate();
+  const { mutate: loginManager, isPending, error } = useManagerLoginMutation();
+  const { mutate: googleLoginManager, isPending: isGoogleLoginPending } = useManagerGoogleLoginMutation();
 
-const loginSchema = yup.object({
-  email: yup.string().email("Invalid email").required("Email is required"),
-  password: yup.string().required("Password is required"),
-  rememberMe: yup.boolean().optional(),
-})
-
-const ManagerLogin: React.FC = () => {
-  const navigate = useNavigate()
-  const [showPassword, setShowPassword] = useState<boolean>(false)
-  const [error, setError] = useState<string>("")
-  const [loading, setLoading] = useState(false)
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormInputs>({
-    resolver: yupResolver(loginSchema),
-    defaultValues: {
-      rememberMe: false
-    }
-  })
-
-  const onSubmit = async (data: LoginFormInputs) => {
-    try {
-      setError("")
-      setLoading(true)
-
-      const response = await axiosInstance.post("/auth/login",
-        {
-          email: data.email,
-          password: data.password,
-          role: "manager",
-          rememberMe: data.rememberMe
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      )
-
-      if (response.data.success) {
-        localStorage.setItem("token", response.data.token)
-        localStorage.setItem("managerData", JSON.stringify(response.data.user))
-        toast.success("Login successful!", {
-          style: { backgroundColor: "#34D399", color: "white" },
-        });
-
-        navigate("/manager/dashboard")
-      }
-    } catch (error: any) {
-      const errorMessage = error.response?.data?.message || "An error occurred during login"
-      setError(errorMessage)
-      toast.error(errorMessage, {
-        style: { backgroundColor: "#EF4444", color: "white" },
-      });
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword)
-  }
-
-  const handleGoogleLoginSuccess = async (credentialResponse: any) => {
-    try {
-      setLoading(true)
-      setError("")
-
-      const response = await axiosInstance.post("auth/google/token", 
-        {
-          credential: credentialResponse.credential,
-          role: "manager",
+  const handleLoginSubmit = (data: ILoginData & { rememberMe?: boolean }) => {
+    loginManager(data, {
+      onSuccess: (response) => {
+        if (response.success) {
+          localStorage.setItem("token", response.token);
+          localStorage.setItem("managerData", JSON.stringify(response.user));
+          
+          toast.success("Login successful!", {
+            style: { 
+              backgroundColor: "#34D399", 
+              color: "white" 
+            }
+          });
+          
+          navigate("/manager/dashboard");
         }
-      )
-      toast.success("Google authentication successful!", {
-        style: { backgroundColor: "#34D399", color: "white" },
-      });
+      },
+      onError: (error: any) => {
+        const errorMessage = error.response?.data?.message || "An error occurred during login";
+        toast.error(errorMessage, {
+          style: { 
+            backgroundColor: "#EF4444", 
+            color: "white" 
+          }
+        });
+      }
+    });
+  };
 
-      localStorage.setItem("token", response.data.token)
-      localStorage.setItem("managerData", JSON.stringify(response.data.user))
+  const handleGoogleLoginSuccess = (credentialResponse: any) => {
+    googleLoginManager(credentialResponse.credential, {
+      onSuccess: (response) => {
+        if (response.success) {
+          localStorage.setItem("token", response.token);
+          localStorage.setItem("managerData", JSON.stringify(response.user));
+          
+          toast.success("Google authentication successful!", {
+            style: { 
+              backgroundColor: "#34D399", 
+              color: "white" 
+            }
+          });
+          
+          navigate("/manager/dashboard");
+        }
+      },
+      onError: (error: any) => {
+        const errorMessage = error.response?.data?.message || "Google authentication failed";
+        toast.error(errorMessage, {
+          style: { 
+            backgroundColor: "#EF4444", 
+            color: "white" 
+          }
+        });
+      }
+    });
+  };
 
-      navigate("/manager/dashboard")
-    } catch (err: any) {
-      console.error("Google login error:", err)
-      setError(err.response?.data?.message || "Google authentication failed")
-      toast.error(err.response?.data?.message , {
-        style: { backgroundColor: "#EF4444", color: "white" },
-      });
-    } finally {
-      setLoading(false)
-    }
-  }
   const handleGoogleLoginError = () => {
-    const errorMessage = "Google login failed. Please try again.";
-    setError(errorMessage);    
-  }
+    toast.error("Google login failed. Please try again.", {
+      style: { 
+        backgroundColor: "#EF4444", 
+        color: "white" 
+      }
+    });
+  };
+
+  const errorMessage = (error as any)?.response?.data?.message || "";
 
   return (
-    <div className="min-h-screen bg-gray-9000 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+    <AnimatePresence mode="wait">
       <motion.div
+        key="login"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
       >
-        <Card>
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center">Welcome back</CardTitle>
-            <CardDescription className="text-center">Sign in to your Manager account</CardDescription>
-          </CardHeader>
-
-          {error && (
-            <div className="px-6 mb-4">
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            </div>
-          )}
-
-          <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email Address</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input 
-                    id="email" 
-                    type="email" 
-                    className="pl-10" 
-                    placeholder="you@example.com" 
-                    {...register("email")} 
-                  />
-                </div>
-                {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <Label htmlFor="password">Password</Label>
-                  <a href="/forgot-password" className="text-xs text-primary hover:underline">
-                    Forgot password?
-                  </a>
-                </div>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    className="pl-10 pr-10"
-                    placeholder="Enter your password"
-                    {...register("password")}
-                  />
-                  <button
-                    type="button"
-                    onClick={togglePasswordVisibility}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-500 focus:outline-none"
-                  >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {errors.password && <p className="text-sm text-red-500">{errors.password.message}</p>}
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="rememberMe"
-                  className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
-                  {...register("rememberMe")}
-                />
-                <Label htmlFor="rememberMe" className="text-sm font-normal">Remember me</Label>
-              </div>
-
-              <Button type="submit" className="w-full" disabled={isSubmitting || loading}>
-                {(isSubmitting || loading) ? "Signing in..." : "Sign in"}
-              </Button>
-            </form>
-
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <Separator />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-              </div>
-            </div>
-
-            <div className="flex justify-center">
-              <GoogleLogin
-                onSuccess={handleGoogleLoginSuccess}
-                onError={handleGoogleLoginError}
-                useOneTap
-                logo_alignment="center"
-                text="continue_with"
-                shape="rectangular"
-              />
-            </div>
-          </CardContent>
-
-          <CardFooter className="flex flex-col space-y-4">
-            <p className="text-sm text-center text-muted-foreground">
-              Don't have an account?{" "}
-              <span
-                className="font-medium text-primary hover:underline cursor-pointer"
-                onClick={() => navigate("/manager/signup")}
-              >
-                Sign up
-              </span>
-            </p>
-            <p className="text-xs text-center text-muted-foreground">
-              Need help? <a href="/contact-support" className="text-primary hover:underline">Contact support</a>
-            </p>
-          </CardFooter>
-        </Card>
+        <SignIn
+          userType="manager"
+          onSubmit={handleLoginSubmit}
+          isLoading={isPending || isGoogleLoginPending}
+          error={errorMessage}
+          onGoogleSuccess={handleGoogleLoginSuccess}
+          onGoogleError={handleGoogleLoginError}
+        />
       </motion.div>
-    </div>
-  )
-}
+    </AnimatePresence>
+  );
+};
 
-export default ManagerLogin
+export default ManagerLogin;

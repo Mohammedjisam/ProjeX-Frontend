@@ -6,7 +6,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import Sidebar from "./Sidebar"
 import Header from "./Header"
-import axiosInstance from "../../utils/AxiosConfig"
+import managerAxiosInstance from "../../utils/ManagerAxiosInstance"
 
 interface ProjectManager {
   _id: string
@@ -58,7 +58,7 @@ const EditProject: React.FC = () => {
           return
         }
 
-        const managersResponse = await axiosInstance.get(`/manager/getallprojectmanager`, {
+        const managersResponse = await managerAxiosInstance.get(`/getallprojectmanager`, {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -68,7 +68,7 @@ const EditProject: React.FC = () => {
           toast.error("Failed to load project managers data")
         }
 
-        const projectResponse = await axiosInstance.get(`/project/getallprojects/${id}`, {
+        const projectResponse = await managerAxiosInstance.get(`/project/getallprojects/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         })
 
@@ -139,7 +139,7 @@ const EditProject: React.FC = () => {
         status: projectData.status,
       }
 
-      const response = await axiosInstance.put(`/project/updateproject/${id}`, formattedData, {
+      const response = await managerAxiosInstance.put(`/project/updateproject/${id}`, formattedData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

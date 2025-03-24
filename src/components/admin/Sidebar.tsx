@@ -17,7 +17,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ className = "" }) => {
   const navigate = useNavigate();
   
   const [navigation, setNavigation] = React.useState<NavItem[]>([
-    { name: "Dashboard", icon: HomeIcon, path: "/admin/dashboard", current: true },
+    { name: "Dashboard", icon: HomeIcon, path: "/admin/dashboard", current: false },
     { name: "Plans", icon: DocumentTextIcon, path: "/admin/plans", current: false },
     { name: "Company", icon: BuildingIcon  , path: "/admin/company", current: false },
     { name: "Subscriptions", icon: CreditCardIcon, path: "/admin/subscriptions", current: false },

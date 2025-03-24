@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import axios from 'axios';
-import axiosInstance from '../../utils/AxiosConfig';
 import Sidebar from './Sidebar';
 import { useNavigate } from 'react-router-dom';
+import companyadminAxiosInstance from '../../utils/CompanyAdminAxiosInstance';
 
 
 interface Manager {
@@ -28,7 +28,7 @@ const ManagersTable: React.FC = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axiosInstance.get('/companyadmin/getallmanager');
+      const response = await companyadminAxiosInstance.get('/getallmanager');
 
       if (response.data && response.data.data) {
         setManagers(response.data.data);
@@ -64,7 +64,7 @@ const ManagersTable: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      await axiosInstance.delete(`/companyadmin/getallmanager/${id}`);
+      await companyadminAxiosInstance.delete(`/getallmanager/${id}`);
 
       setManagers(managers.filter(manager => manager._id !== id));
       toast.success('Manager deleted successfully');

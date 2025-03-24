@@ -5,7 +5,8 @@ import { motion } from 'framer-motion';
 import { toast } from 'sonner';
 import { Lock, Eye, EyeOff, Check } from 'lucide-react';
 import axios from 'axios';
-import axiosInstance from '../../utils/AxiosConfig';
+import axiosInstance from '../../utils/AxiosInstance';
+
 const SetPasswordPage: React.FC = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();

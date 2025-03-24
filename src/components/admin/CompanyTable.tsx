@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Loader2, Filter, ChevronDown } from "lucide-react";
-import axiosInstance from "../../utils/AxiosConfig";
-import { useNavigate } from "react-router-dom";
+import { Loader2, Filter, ChevronDown } from "lucide-react";import { useNavigate } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
+import adminAxiosInstance from "../../utils/AdminAxiosInstance";
 
 interface Company {
   _id: string;
@@ -70,7 +69,7 @@ export default function CompanyTable() {
       if (filters.country) queryParams.append("country", filters.country);
       if (filters.verified) queryParams.append("verified", filters.verified);
 
-      const response = await axiosInstance.get(`/company`);
+      const response = await adminAxiosInstance.get(`/company`);
       
       if (response.data.success) {
         setCompanies(response.data.data);
@@ -233,7 +232,7 @@ export default function CompanyTable() {
                     <th className="py-3 px-4 text-left">Domain</th>
                     <th className="py-3 px-4 text-left">Phone</th>
                     <th className="py-3 px-4 text-left">Location</th>
-                    <th className="py-3 px-4 text-left">CompanyAdmin</th>
+                    {/* <th className="py-3 px-4 text-left">CompanyAdmin</th> */}
                     <th className="py-3 px-4 text-left">Verification</th>
                     <th className="py-3 px-4 text-center">Actions</th>
                   </tr>
@@ -256,7 +255,7 @@ export default function CompanyTable() {
                         <td className="py-4 px-4">
                           {company.address.city}, {company.address.country}
                         </td>
-                        <td className="py-4 px-4">{company.companyAdmin.name}</td>
+                        {/* <td className="py-4 px-4">{company.companyAdmin}</td> */}
                         <td className="py-4 px-4">
                           {company.adminVerification ? (
                             <span className="text-green-400">Verified</span>

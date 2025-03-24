@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { CheckCircle, Clock } from 'lucide-react';
-import axiosInstance from '../../utils/AxiosConfig';
 import { useSelector } from 'react-redux'; // Import useSelector hook
+import developerAxiosInstance from '../../utils/DeveloperAxiosInstance';
 
 // Define RootState interface for Redux store
 interface RootState {
-  auth: {
-    user: {
-      _id: string;
-      // Add other user properties as needed
-    };
-    token: string;
-  };
+  developer: {
+    developerData: {
+      id?: string;
+      _id?: string;
+      name: string;
+      email: string;
+      role: string;
+    }
+  }
 }
 
 interface Task {
@@ -43,7 +45,7 @@ const notifications: Notification[] = [
 ];
 
 const DashboardContent: React.FC = () => {
-  // Get user and token from Redux store
+  // Get developer data from Redux store
   const developerData = useSelector((state: RootState) => state.developer.developerData)
   
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -55,24 +57,24 @@ const DashboardContent: React.FC = () => {
     pending: 0
   });
 
-  console.log("developer data",developerData)
+  console.log("developer data", developerData)
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setIsLoading(true);
         
-        // Check if user and token exist
-        if (!developerData || !developerData._id) {
+        // Check if user exists and has either _id or id
+        if (!developerData || (!developerData._id && !developerData.id)) {
           throw new Error('User not authenticated');
         }
         
-     
+        // Use either _id or id, whichever is available
+        const userId = developerData._id || developerData.id;
         
         // Send assigneeId in the request body
-        const response = await axiosInstance.post('/task/assignee', 
-          { assigneeId: developerData._id },
-        
+        const response = await developerAxiosInstance.post('/task/assignee', 
+          { assigneeId: userId },
         );
         
         if (response.data.success) {
@@ -97,7 +99,7 @@ const DashboardContent: React.FC = () => {
     };
     
     fetchDashboardData();
-  }, [developerData]); // Add user and token as dependencies
+  }, [developerData]); // Add developerData as dependency
 
   return (
     <div className="px-6 py-8 h-full overflow-auto">

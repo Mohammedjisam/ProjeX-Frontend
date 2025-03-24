@@ -6,7 +6,7 @@ import { motion } from "framer-motion"
 import { toast } from "sonner"
 import { UserPlus, Mail, Phone, Save, X } from "lucide-react"
 import axios from "axios"
-import axiosInstance from "../../utils/AxiosConfig"
+import managerAxiosInstance from "../../utils/ManagerAxiosInstance"
 
 interface FormData {
   name: string
@@ -71,7 +71,7 @@ const AddDeveloperForm: React.FC<AddDeveloperFormProps> = ({ onSuccess, onCancel
     setLoading(true)
 
     try {
-      const response = await axiosInstance.post("/manager/addnewdeveloper", formData)
+      const response = await managerAxiosInstance.post("/addnewdeveloper", formData)
 
       if (response.data.success) {
         toast.success(" Developer added successfully. Password setup email sent.")

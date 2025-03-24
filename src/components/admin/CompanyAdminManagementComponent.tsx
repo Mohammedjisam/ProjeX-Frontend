@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import axiosInstance from "../../utils/AxiosConfig";
 import { Sidebar } from "./Sidebar";
 import { Search, RefreshCw, UserPlus, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
+import adminAxiosInstance from "../../utils/AdminAxiosInstance";
 
 // Types
 interface CompanyAdmin {
@@ -31,7 +31,7 @@ const CompanyAdminManagement: React.FC = () => {
     try {
       setLoading(true);
       
-      const response = await axiosInstance.get("/admin/companyadmin");
+      const response = await adminAxiosInstance.get("/companyadmin");
       
       setCompanyAdmins(response.data.data);
       setError(null);
@@ -47,7 +47,7 @@ const CompanyAdminManagement: React.FC = () => {
 
   const handleToggleStatus = async (id: string) => {
     try {
-      await axiosInstance.patch(`/admin/companyadmin/${id}/togglestatus`);
+      await adminAxiosInstance.patch(`/companyadmin/${id}/togglestatus`);
       
       // Update local state to reflect the change
       setCompanyAdmins(prevAdmins =>
@@ -67,7 +67,7 @@ const CompanyAdminManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm("Are you sure you want to delete this company admin?")) {
       try {
-        await axiosInstance.delete(`/admin/companyadmin/${id}`);
+        await adminAxiosInstance.delete(`/companyadmin/${id}`);
         
         // Remove deleted admin from state
         setCompanyAdmins(prevAdmins => prevAdmins.filter(admin => admin._id !== id));

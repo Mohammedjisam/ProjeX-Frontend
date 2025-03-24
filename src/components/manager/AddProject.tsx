@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import Sidebar from "./Sidebar"
 import Header from "./Header"
-import axiosInstance from "../../utils/AxiosConfig"
+import managerAxiosInstance from "../../utils/ManagerAxiosInstance"
 
 interface ProjectManager {
   _id: string
@@ -56,7 +56,7 @@ const AddNewProject: React.FC = () => {
           return
         }
 
-        const response = await axiosInstance.get(`/manager/getallprojectmanager`)
+        const response = await managerAxiosInstance.get(`/getallprojectmanager`)
         console.log("Project managers response:", response.data)
 
         if (response.data.success && response.data.data) {
@@ -98,7 +98,7 @@ const AddNewProject: React.FC = () => {
         budget: projectData.budget === "" ? 0 : Number(projectData.budget),
       }
 
-      const response = await axiosInstance.post(`/project/addnewproject`, formattedData, {
+      const response = await managerAxiosInstance.post(`/project/addnewproject`, formattedData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

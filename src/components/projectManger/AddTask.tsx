@@ -7,7 +7,8 @@ import { useSelector } from "react-redux"
 import type { RootState } from "../../redux/Store"
 import Sidebar from "./Sidebar"
 import { Calendar, Check, ChevronDown } from "lucide-react"
-import axiosInstance from "../../utils/AxiosConfig"
+import projectmanagerAxiosInstance from "../../utils/ProjectManagerAxiosInstance"
+import taskAxiosInstance from "../../utils/TaskAxiosInstance"
 
 interface Project {
   _id: string
@@ -68,7 +69,7 @@ const AddTask: React.FC = () => {
         
 
         
-        const developersRes = await axiosInstance.get("/manager/getalldeveloper");
+        const developersRes = await projectmanagerAxiosInstance.get("/getalldeveloper");
         console.log("Developers API response:", developersRes);
 
   
@@ -129,7 +130,7 @@ const AddTask: React.FC = () => {
   
       console.log("Sending task data:", taskData)
   
-      const response = await axiosInstance.post(`/task/project/${projectId}`, {
+      const response = await taskAxiosInstance.post(`/project/${projectId}`, {
         ...formData,
         createdBy: userData?.id,
       });  

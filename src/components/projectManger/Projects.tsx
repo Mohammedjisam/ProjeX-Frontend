@@ -4,7 +4,6 @@ import type React from "react"
 import { useState, useEffect } from "react"
 import { useSelector } from "react-redux"
 import type { RootState } from "../../redux/Store"
-import axiosInstance from "../../utils/AxiosConfig"
 import { Eye, Search } from "lucide-react"
 import { format } from "date-fns"
 import { Link } from "react-router-dom"
@@ -14,6 +13,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 import { Card } from "../../components/ui/card"
 import { Skeleton } from "../../components/ui/skeleton"
 import Sidebar from "./Sidebar"
+import projectAxiosInstance from "../../utils/ProjectAxioInstance"
 
 interface Project {
   _id: string
@@ -38,9 +38,9 @@ const Projects: React.FC = () => {
 
       let response
       if (projectManagerData?._id) {
-        response = await axiosInstance.get(`/project/projectmanager/${projectManagerData._id}`)
+        response = await projectAxiosInstance.get(`/projectmanager/${projectManagerData._id}`)
       } else {
-        response = await axiosInstance.get("/project/getallprojects")
+        response = await projectAxiosInstance.get("/getallprojects")
       }
 
       if (response.data.success) {

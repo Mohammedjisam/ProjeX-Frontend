@@ -6,6 +6,7 @@ import axiosInstance from '../../utils/AxiosConfig';
 import ProjectCard from './ProjectCard';
 import ManagerCard from './ManagerCard';
 import Sidebar from './Sidebar';
+import companyadminAxiosInstance from '../../utils/CompanyAdminAxiosInstance';
 
 interface Manager {
   _id: string;
@@ -54,9 +55,9 @@ const Dashboard: React.FC = () => {
       setError(null);
       
       // Fetch managers data
-      const managersResponse = await axiosInstance.get('/companyAdmin/getallmanager');
+      const managersResponse = await companyadminAxiosInstance.get('/getallmanager');
       // Fetch projects data with populated project manager
-      const projectsResponse = await axiosInstance.get('/project/getallprojects');
+      const projectsResponse = await companyadminAxiosInstance.get('/project/getallprojects');
       
       if (managersResponse.data && managersResponse.data.success) {
         const managersData = managersResponse.data.data;

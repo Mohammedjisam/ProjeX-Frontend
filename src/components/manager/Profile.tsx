@@ -5,7 +5,6 @@ import { Edit, Save, Upload, User, Phone, Mail, Loader2 } from 'lucide-react';
 import Sidebar from '../../components/manager/Sidebar';
 import Header from '../../components/manager/Header';
 import { updateManager } from '../../redux/slice/ManagerSlice'; // Changed from addManager to updateManager
-import axiosInstance from '../../utils/AxiosConfig';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -13,6 +12,7 @@ import { Label } from "../../components/ui/label";
 import { Alert, AlertDescription } from "../../components/ui/alert";
 import { Avatar, AvatarImage, AvatarFallback } from "../../components/ui/avatar";
 import { Separator } from "../../components/ui/separator";
+import authAxiosInstance from '../../utils/AuthAxiosInstance';
 
 const Profile: React.FC = () => {
   const dispatch = useDispatch();
@@ -83,7 +83,7 @@ const Profile: React.FC = () => {
       };
 
       // Make API call to update profile
-      const response = await axiosInstance.put('/auth/profile', updateData);
+      const response = await authAxiosInstance.put('/profile', updateData);
       
       // Update Redux state with new user data - key change here
       dispatch(updateManager(response.data.user)); // Changed from addManager to updateManager and response.data.manager to response.data.user

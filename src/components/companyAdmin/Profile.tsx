@@ -4,7 +4,6 @@ import { RootState } from '../../redux/Store';
 import { Edit, Save, Upload, User, Phone, Mail, Loader2 } from 'lucide-react';
 import Sidebar from './Sidebar';
 import { updateCompanyAdmin } from '../../redux/slice/CompanyAdminSlice';
-import axiosInstance from '../../utils/AxiosConfig';
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -12,6 +11,7 @@ import { Label } from "../ui/label";
 import { Alert, AlertDescription } from "../ui/alert";
 import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar";
 import { Separator } from "../ui/separator";
+import authAxiosInstance from '../../utils/AuthAxiosInstance';
 
 const Profile: React.FC = () => {
   const dispatch = useDispatch();
@@ -82,7 +82,7 @@ const Profile: React.FC = () => {
       };
 
       // Make API call to update profile
-      const response = await axiosInstance.put('/auth/profile', updateData);
+      const response = await authAxiosInstance.put('/profile', updateData);
       
       // Update Redux state with new user data
       dispatch(updateCompanyAdmin(response.data.user));

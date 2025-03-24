@@ -44,6 +44,7 @@ import {
 } from "../../components/ui/avatar";
 import { Progress } from "../../components/ui/progress";
 import { Skeleton } from "../../components/ui/skeleton";
+import projectAxiosInstance from "../../utils/ProjectAxioInstance";
 
 interface ProjectDetails {
   _id: string;
@@ -97,13 +98,13 @@ const ProjectDetails: React.FC = () => {
         let response;
         if (projectManagerData?._id) {
           // Use the correct endpoint from your API
-          response = await axiosInstance.get(
-            `/project/projectmanager/${projectManagerData._id}/project/${id}`
+          response = await projectAxiosInstance.get(
+            `/projectmanager/${projectManagerData._id}/project/${id}`
           );
           console.log("Using manager-specific endpoint");
         } else {
           // Use the correct general endpoint from your API
-          response = await axiosInstance.get(`/project/getallprojects/${id}`);
+          response = await projectAxiosInstance.get(`/getallprojects/${id}`);
           console.log("Using general project endpoint");
         }
 

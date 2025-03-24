@@ -6,7 +6,7 @@ import { motion } from "framer-motion"
 import { toast } from "sonner"
 import { UserPlus, Mail, Phone, Save, X } from "lucide-react"
 import axios from "axios"
-import axiosInstance from "../../utils/AxiosConfig"
+import companyadminAxiosInstance from "../../utils/CompanyAdminAxiosInstance"
 
 interface FormData {
   name: string
@@ -71,7 +71,7 @@ const AddManagerForm: React.FC<AddManagerFormProps> = ({ onSuccess, onCancel }) 
     setLoading(true)
 
     try {
-      const response = await axiosInstance.post("/companyadmin/addnewmanager", formData)
+      const response = await companyadminAxiosInstance.post("/addnewmanager", formData)
 
       if (response.data.success) {
         toast.success("Manager added successfully. Password setup email sent.")
