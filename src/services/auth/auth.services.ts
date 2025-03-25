@@ -1,6 +1,6 @@
-import { IAuthResponse } from "../types/Response";
-import { ILoginData } from "../types/User";
-import authAxiosInstance from "../utils/AuthAxiosInstance";
+import { IAuthResponse } from "../../types/Response";
+import { ILoginData } from "../../types/User";
+import authAxiosInstance from "../../utils/AuthAxiosInstance";
 
 
 export const adminSignin = async (credentials: ILoginData): Promise<IAuthResponse> => {

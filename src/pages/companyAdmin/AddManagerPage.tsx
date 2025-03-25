@@ -1,9 +1,8 @@
-
+// src/pages/companyadmin/managers/add/AddManagerPage.tsx
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar';
-import AddManagerForm from './AddManagerForm';
-
+import Sidebar from '../../components/companyAdmin/Sidebar';
+import AddManagerForm from '../../components/companyAdmin/manager/AddManagerForm';
 const AddManagerPage: React.FC = () => {
   const navigate = useNavigate();
 

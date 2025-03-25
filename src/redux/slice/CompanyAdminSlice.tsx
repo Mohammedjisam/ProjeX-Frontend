@@ -1,14 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { ProfileData } from "../../types/Profile";
 
 interface CompanyAdminState {
-  companyAdminData: any | null;
+  companyAdminData: ProfileData | null;
 }
 
 const initialState: CompanyAdminState = {
   companyAdminData: (() => {
     try {
       const storedData = localStorage.getItem("companyAdminData");
-      return storedData && storedData !== "undefined" ? JSON.parse(storedData) : null;
+      return storedData && storedData !== "undefined" 
+        ? JSON.parse(storedData) 
+        : null;
     } catch (error) {
       console.warn("Error parsing companyAdminData from localStorage:", error);
       localStorage.removeItem("companyAdminData");
@@ -21,16 +24,18 @@ const companyAdminSlice = createSlice({
   name: "companyAdmin",
   initialState,
   reducers: {
-    addCompanyAdmin: (state, action: PayloadAction<any>) => {
+    setCompanyAdmin: (state, action: PayloadAction<ProfileData>) => {
       state.companyAdminData = action.payload;
       localStorage.setItem("companyAdminData", JSON.stringify(action.payload));
     },
-    updateCompanyAdmin: (state, action: PayloadAction<any>) => {
-      state.companyAdminData = {
-        ...state.companyAdminData,
-        ...action.payload
-      };
-      localStorage.setItem("companyAdminData", JSON.stringify(state.companyAdminData));
+    updateCompanyAdmin: (state, action: PayloadAction<Partial<ProfileData>>) => {
+      if (state.companyAdminData) {
+        state.companyAdminData = {
+          ...state.companyAdminData,
+          ...action.payload,
+        };
+        localStorage.setItem("companyAdminData", JSON.stringify(state.companyAdminData));
+      }
     },
     logoutCompanyAdmin: (state) => {
       state.companyAdminData = null;
@@ -40,5 +45,5 @@ const companyAdminSlice = createSlice({
   },
 });
 
-export const { addCompanyAdmin,updateCompanyAdmin, logoutCompanyAdmin } = companyAdminSlice.actions;
+export const { setCompanyAdmin, updateCompanyAdmin, logoutCompanyAdmin } = companyAdminSlice.actions;
 export default companyAdminSlice.reducer;

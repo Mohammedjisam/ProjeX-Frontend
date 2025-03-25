@@ -2,18 +2,18 @@
 import { Route, Routes } from 'react-router-dom';
 import CompanyAdminSignup from '../pages/companyAdmin/Signup';
 import CompanyAdminLogin from '../pages/companyAdmin/Login';
-import Dashboard from '../components/companyAdmin/Dashboard';
+import Dashboard from '../pages/companyAdmin/Dashboard';
 import ProtectedCompanyAdminLogin from '../private/companyAdmin/ProtectedCompanyAdminLogin';
 import ProtectedCompanyAdminRoutes from '../private/companyAdmin/ProtectedCompanyAdminRoute';
-import ManagersTable from '../components/companyAdmin/ManagersTable';
-import AddManagerPage from '../components/companyAdmin/AddManagerPage';
 import FirstPage from '../pages/companyAdmin/FirstPage';
-import Profile from '../components/companyAdmin/Profile';
 import PaymentPage from '../pages/companyAdmin/Stripe';
-import TenantForm from '../pages/companyAdmin/CompanyRegistration'; // Renamed from Tenant
-import ProjectTable from '../components/companyAdmin/ProjectTable';
-import ViewProject from '../components/companyAdmin/ViewProject';
-import PaymentSuccess from '../pages/companyAdmin/PaymentSuccess'; // New component
+import TenantForm from '../pages/companyAdmin/CompanyRegistrationPage';
+import PaymentSuccess from '../pages/companyAdmin/PaymentSuccess'; 
+import ViewProject from '../pages/companyAdmin/ViewProject';
+import ManagersTable from '../pages/companyAdmin/ManagersTable';
+import AddManagerPage from '../pages/companyAdmin/AddManagerPage';
+import ProjectTable from '../pages/companyAdmin/ProjectTable';
+import Profile from '../pages/companyAdmin/Profile';
 
 function CompanyAdminRoutes() {
   return (

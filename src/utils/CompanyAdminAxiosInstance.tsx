@@ -1,7 +1,7 @@
 import axios from "axios"
 
 const companyadminAxiosInstance = axios.create({
-  baseURL: "http://localhost:5000/api/projectmanager",
+  baseURL: "http://localhost:5000/api/companyadmin",
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",

@@ -4,3 +4,8 @@ export interface IAuthResponse {
     user: any; 
     message: string;
   }
+
+  export interface ICompanyRegistrationResponse extends IAuthResponse {
+    company?: any; 
+    subscription?: any; 
+  }
