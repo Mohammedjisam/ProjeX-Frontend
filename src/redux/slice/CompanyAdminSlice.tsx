@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ProfileData } from "../../types/Profile";
+import { ProfileData } from "../../types/common/Profile";
 
 interface CompanyAdminState {
   companyAdminData: ProfileData | null;

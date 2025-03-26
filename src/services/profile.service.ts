@@ -1,5 +1,5 @@
 // src/services/profile.service.ts
-import { ProfileUpdatePayload } from '../types/Profile';
+import { ProfileUpdatePayload } from '../types/common/Profile';
 import authAxiosInstance from '../utils/AuthAxiosInstance';
 
 export const updateProfile = async (data: ProfileUpdatePayload) => {

@@ -4,8 +4,8 @@ import {
   createCompanyPaymentIntent, 
   completeCompanyCreation
 } from "../../services/company/company.services";
-import { ICompanyFormData } from "../../types/Company";
-import { IPaymentIntentResponse, ICompanyRegistrationResponse } from "../../types/Response";
+import { ICompanyFormData } from "../../types/CompanyAdmin/Company";
+import { IPaymentIntentResponse, ICompanyRegistrationResponse } from "../../types/CompanyAdmin/Response";
 
 export const useCreateCompanyPaymentIntent = () => {
   return useMutation<

@@ -1,6 +1,6 @@
 // src/pages/companyadmin/projects/[projectId]/components/ProjectManagerCard.tsx
 import React from 'react';
-import { ProjectManager } from '../../../types/Project';
+import { ProjectManager } from '../../../types/CompanyAdmin/Project';
 
 const ProjectManagerCard: React.FC<{ projectManager: ProjectManager }> = ({ projectManager }) => {
   return (

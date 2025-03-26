@@ -1,6 +1,6 @@
 // src/pages/companyadmin/projects/components/ProjectTableRow.tsx
 import React from 'react';
-import { Project } from '../../../types/Project';
+import { Project } from '../../../types/CompanyAdmin/Project';
 import { format } from 'date-fns';
 
 interface ProjectTableRowProps {

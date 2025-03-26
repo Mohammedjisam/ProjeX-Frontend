@@ -1,6 +1,6 @@
 // src/pages/companyadmin/projects/[projectId]/components/ProjectHeader.tsx
 import React from 'react';
-import { ProjectData } from '../../../types/Project';
+import { ProjectData } from '../../../types/CompanyAdmin/Project';
 import { CheckCircle, XCircle } from 'lucide-react';
 
 interface ProjectHeaderProps {

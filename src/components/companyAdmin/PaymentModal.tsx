@@ -6,8 +6,8 @@ import { Button } from '../ui/button';
 import { X } from 'lucide-react';
 import { useCompleteCompanyCreation } from '../../hooks/companyAdmin/useCompany';
 import { toast } from 'sonner';
-import { ICompanyFormData } from '../../types/Company';
-import { ICompanyRegistrationResponse } from '../../types/Response';
+import { ICompanyFormData } from '../../types/CompanyAdmin/Company';
+import { ICompanyRegistrationResponse } from '../../types/CompanyAdmin/Response';
 import { useSelector } from 'react-redux';
 
 const stripePromise = loadStripe("pk_test_51R3bqVHFwsFl0yfuPNKLqJnlw6OEG6zalVVCxndzAgyVzBGgBo032gSZXsjeay5K1ivUulgmchXSP3gqCaERKt4f00GUut0vRp");

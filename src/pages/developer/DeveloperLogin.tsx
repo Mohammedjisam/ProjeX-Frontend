@@ -5,7 +5,7 @@ import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ILoginData } from "../../types/User";
+import { ILoginData } from "../../types/common/User";
 import { 
   useDeveloperLoginMutation,
   useDeveloperGoogleLoginMutation 

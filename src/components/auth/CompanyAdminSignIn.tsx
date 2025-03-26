@@ -7,7 +7,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { AlertCircle, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { ILoginData } from "../../types/User";
+import { ILoginData } from "../../types/common/User";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../../components/ui/card";
 import { Separator } from "../../components/ui/separator";
 import { GoogleLogin } from "@react-oauth/google";

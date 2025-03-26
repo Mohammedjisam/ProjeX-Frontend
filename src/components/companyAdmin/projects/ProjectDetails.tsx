@@ -1,6 +1,6 @@
 // src/pages/companyadmin/projects/[projectId]/components/ProjectDetails.tsx
 import React from 'react';
-import { ProjectData } from '../../../types/Project';
+import { ProjectData } from '../../../types/CompanyAdmin/Project';
 import ProjectManagerCard from './ProjectManagerCard';
 import ProjectTimeline from './ProjectTimeline';
 

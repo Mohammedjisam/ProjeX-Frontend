@@ -1,4 +1,4 @@
-import { Manager,ManagerFormData  } from '../../types/Manager';
+import { Manager,ManagerFormData  } from '../../types/Manager/Manager';
 import companyadminAxiosInstance from '../../utils/CompanyAdminAxiosInstance';
 
 export const fetchManagers = async (): Promise<Manager[]> => {

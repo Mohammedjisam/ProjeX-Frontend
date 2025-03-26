@@ -6,7 +6,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { AlertCircle, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { ILoginData } from "../../types/User";
+import { ILoginData } from "../../types/common/User";
 
 interface SignInProps {
   userType: "admin";

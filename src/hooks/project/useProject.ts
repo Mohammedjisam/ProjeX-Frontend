@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchProject, toggleVerification } from '../../services/Project/project.services';
-import { ProjectData } from '../../types/Project';
+import { ProjectData } from '../../types/CompanyAdmin/Project';
 
 export const useProject = (projectId: string) => {
   const [project, setProject] = useState<ProjectData | null>(null);

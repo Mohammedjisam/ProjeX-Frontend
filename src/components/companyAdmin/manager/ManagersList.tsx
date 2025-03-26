@@ -1,6 +1,6 @@
 // src/pages/companyadmin/managers/components/ManagersList.tsx
 import React from 'react';
-import { Manager } from '../../../types/Manager';
+import { Manager } from '../../../types/Manager/Manager';
 import EmptyState from './EmptyState';
 
 interface ManagersListProps {

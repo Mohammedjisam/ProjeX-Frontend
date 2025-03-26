@@ -4,10 +4,10 @@ import Sidebar from '../../components/companyAdmin/Sidebar';
 import { useProfile } from '../../hooks/useProfile';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Skeleton } from "../../components/ui/skeleton"
-import ProfileForm from '../../components/companyAdmin/Profile/ProfileForm';
-import ProfileAvatar from '../../components/companyAdmin/Profile/ProfileAvatar';
-import AlertMessage from '../../components/companyAdmin/Profile/AlertMessage';
-import EditButton from '../../components/companyAdmin/Profile/EditButton';
+import ProfileForm from '../../components/common/Profile/ProfileForm';
+import ProfileAvatar from '../../components/common/Profile/ProfileAvatar';
+import AlertMessage from '../../components/common/Profile/AlertMessage';
+import EditButton from '../../components/common/Profile/EditButton';
 
 const Profile: React.FC = () => {
     const [isEditing, setIsEditing] = useState(false);

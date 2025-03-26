@@ -11,8 +11,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { useCreateCompanyPaymentIntent } from '../../hooks/companyAdmin/useCompany';
 import { useSelector } from 'react-redux';
 import PaymentModal from './PaymentModal';
-import { ICompanyFormData } from '../../types/Company';
-import { IPaymentIntentResponse } from '../../types/Response';
+import { ICompanyFormData } from '../../types/CompanyAdmin/Company';
+import { IPaymentIntentResponse } from '../../types/CompanyAdmin/Response';
 import { useNavigate } from 'react-router-dom';
 
 const schema = yup.object().shape({

@@ -1,6 +1,6 @@
 // src/services/company.services.ts
-import {  ICompanyRegistrationResponse } from "../../types/Response";
-import { ICompanyFormData, IPaymentIntentResponse } from "../../types/Company";
+import {  ICompanyRegistrationResponse } from "../../types/CompanyAdmin/Response";
+import { ICompanyFormData, IPaymentIntentResponse } from "../../types/CompanyAdmin/Company";
 import axiosInstance from "../../utils/AxiosInstance";
 
 export const createCompanyPaymentIntent = async (

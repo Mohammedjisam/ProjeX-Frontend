@@ -1,7 +1,7 @@
 // src/hooks/useProjects.ts
 import { useState, useEffect } from 'react';
 import { fetchProjects } from '../../services/Project/project.services';
-import { Project } from '../../types/Project';
+import { Project } from '../../types/CompanyAdmin/Project';
 
 export const useProjects = () => {
   const [projects, setProjects] = useState<Project[]>([]);

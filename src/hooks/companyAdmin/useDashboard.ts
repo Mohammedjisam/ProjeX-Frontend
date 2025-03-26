@@ -2,7 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchManagers } from '../../services/companyAdmin/companyAdmin.services';
 import { fetchProjects } from '../../services/Project/project.services';
-import { Manager, Project, TransformedProject } from '../../types/Dashboard';
+import { Manager, Project, TransformedProject } from '../../types/CompanyAdmin/Dashboard';
 
 export const useDashboardData = () => {
   const managersQuery = useQuery<Manager[]>({

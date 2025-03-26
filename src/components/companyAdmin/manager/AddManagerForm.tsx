@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { UserPlus, Mail, Phone, Save, X } from 'lucide-react';
 import { useAddManager } from '../../../hooks/companyAdmin/useAddManager';
 import FormInput from './FormInput';
-import { ManagerFormData } from '../../../types/Manager';
+import { ManagerFormData } from '../../../types/Manager/Manager';
 
 interface AddManagerFormProps {
   onSuccess?: () => void;

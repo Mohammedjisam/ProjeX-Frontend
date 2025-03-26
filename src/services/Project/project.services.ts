@@ -1,5 +1,5 @@
-import { Project } from '../../types/Dashboard';
-import { ProjectData } from '../../types/Project';
+import { Project } from '../../types/CompanyAdmin/Dashboard';
+import { ProjectData } from '../../types/CompanyAdmin/Project';
 import projectAxiosInstance from '../../utils/ProjectAxioInstance';
 
 

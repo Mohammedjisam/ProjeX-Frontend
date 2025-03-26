@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { adminSignin, companyAdminGoogleSignin, companyAdminGoogleSignup, companyAdminSignin, developerGoogleSignin, developerGoogleSignup, developerSignin, initiateCompanyAdminSignup, initiateDeveloperSignup, initiateManagerSignup, initiateProjectManagerSignup, managerGoogleSignin, managerGoogleSignup, managerSignin, projectManagerGoogleSignin, projectManagerGoogleSignup, projectManagerSignin, resendCompanyAdminOTP, resendDeveloperOTP, resendManagerOTP, resendProjectManagerOTP, verifyCompanyAdminSignup, verifyDeveloperSignup, verifyManagerSignup, verifyProjectManagerSignup } from "../services/auth/auth.services";
-import { IAuthResponse } from "../types/Response";
-import { ILoginData } from "../types/User";
+import { IAuthResponse } from "../types/CompanyAdmin/Response";
+import { ILoginData } from "../types/common/User";
 
 export const useAdminLoginMutation = () => {
     return useMutation<IAuthResponse, Error, ILoginData>({

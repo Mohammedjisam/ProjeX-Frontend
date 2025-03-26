@@ -1,5 +1,5 @@
-import { IAuthResponse } from "../../types/Response";
-import { ILoginData } from "../../types/User";
+import { IAuthResponse } from "../../types/CompanyAdmin/Response";
+import { ILoginData } from "../../types/common/User";
 import authAxiosInstance from "../../utils/AuthAxiosInstance";
 
 

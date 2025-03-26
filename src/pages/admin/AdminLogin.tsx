@@ -4,7 +4,7 @@ import SignIn from "../../components/auth/AdminSignIn";
 import { useAdminLoginMutation } from "../../hooks/useLogin";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ILoginData } from "../../types/User";
+import { ILoginData } from "../../types/common/User";
 
 const AdminLogin = () => {
   const navigate = useNavigate();

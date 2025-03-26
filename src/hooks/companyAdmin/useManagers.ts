@@ -1,7 +1,7 @@
 // src/hooks/useManagers.ts
 import { useState, useEffect } from 'react';
 import { fetchManagers, deleteManager } from '../../services/companyAdmin/companyAdmin.services';
-import { Manager } from '../../types/Manager';
+import { Manager } from '../../types/Manager/Manager';
 
 export const useManagers = () => {
   const [managers, setManagers] = useState<Manager[]>([]);

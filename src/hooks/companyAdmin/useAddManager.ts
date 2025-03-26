@@ -1,7 +1,7 @@
 // src/hooks/useAddManager.ts
 import { useState } from 'react';
 import { addManager } from '../../services/companyAdmin/companyAdmin.services';
-import { ManagerFormData } from '../../types/Manager';
+import { ManagerFormData } from '../../types/Manager/Manager';
 
 export const useAddManager = () => {
   const [loading, setLoading] = useState(false);
