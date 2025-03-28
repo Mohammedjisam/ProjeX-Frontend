@@ -47,8 +47,8 @@ export const fetchProjectManagers = async (): Promise<ProjectManager[]> => {
   };
   
   export const addProjectComment = async (projectId: string, comment: string, authorId: string) => {
-    const response = await managerAxiosInstance.post<ProjectsResponse>(
-      `/project/getallprojects/${projectId}/comments`,
+    const response = await projectAxiosInstance.post<ProjectsResponse>(
+      `/getallprojects/${projectId}/comments`,
       { text: comment, authorId }
     );
     if (!response.data.success) throw new Error(response.data.message);
@@ -56,8 +56,8 @@ export const fetchProjectManagers = async (): Promise<ProjectManager[]> => {
   };
   
   export const deleteProject = async (projectId: string) => {
-    const response = await managerAxiosInstance.delete<ProjectsResponse>(
-      `/project/getallprojects/${projectId}`
+    const response = await projectAxiosInstance.delete<ProjectsResponse>(
+      `/getallprojects/${projectId}`
     );
     if (!response.data.success) throw new Error(response.data.message);
     return response.data;

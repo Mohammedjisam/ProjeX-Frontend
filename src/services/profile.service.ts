@@ -9,8 +9,7 @@ export const updateProfile = async (data: ProfileUpdatePayload) => {
     } catch (error) {
       throw error; 
     }
-  };
-  
+  }  
 
 export const getProfile = async () => {
   const response = await authAxiosInstance.get('/profile');

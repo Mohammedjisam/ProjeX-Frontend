@@ -1,15 +1,16 @@
 // src/hooks/useProfile.ts
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../redux/Store';
-import { updateProfile, getProfile } from '../services/profile.service';
-import { updateCompanyAdmin, setCompanyAdmin } from '../redux/slice/CompanyAdminSlice'; // Add setCompanyAdmin
+import { RootState } from '../../redux/Store';
+import { updateProfile, getProfile } from '../../services/profile.service';
+import { updateCompanyAdmin, setCompanyAdmin } from '../../redux/slice/CompanyAdminSlice';
+import { ProfileFormValues } from '../../types/common/Profile';
 
 export const useProfile = () => {
   const dispatch = useDispatch();
   const companyAdminData = useSelector((state: RootState) => state.companyAdmin.companyAdminData);
   const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(true); // Separate state for initial load
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
@@ -33,20 +34,20 @@ export const useProfile = () => {
     setLoading(true);
     setError('');
     setSuccess('');
-
+  
     try {
-      const { user } = await updateProfile(formData);
-      dispatch(updateCompanyAdmin(user));
+      const response = await updateProfile(formData);
+      // Ensure you're using the correct response structure
+      dispatch(updateCompanyAdmin(response.user));
       setSuccess('Profile updated successfully!');
       return true;
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to update profile');
       return false;
     } finally {
-      setLoading(false); // This ensures loading is always reset
+      setLoading(false);
     }
   };
-
   return {
     profileData: companyAdminData,
     loading: loading || initialLoading,

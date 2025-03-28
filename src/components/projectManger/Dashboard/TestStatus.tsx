@@ -1,32 +1,19 @@
 import React, { useEffect, useRef } from 'react';
-
-interface Project {
-  _id: string;
-  title: string;
-  clientName: string;
-  progress: number;
-  status: string;
-}
+import { ProcessedDashboardProject } from '../../../types/projectManager/Dashboard';
+import { getStatusColor } from '../../../services/projectManager/dashboard.services';
 
 interface TestStatusProps {
-  projects: Project[];
+  projects: ProcessedDashboardProject[];
 }
-
-// Define color mapping for different progress levels
-const getColorByProgress = (progress: number): string => {
-  if (progress >= 80) return '#34D399'; // Green
-  if (progress >= 50) return '#0096FF'; // Blue
-  return '#FF5353'; // Red
-};
 
 const TestStatus: React.FC<TestStatusProps> = ({ projects = [] }) => {
   const progressRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Prepare test items from projects data - take up to 4 projects for display
   const testItems = projects.slice(0, 4).map(project => ({
-    name: project.title || project.clientName,
+    name: project.displayName || project.clientName,
     progress: project.progress || 0,
-    color: getColorByProgress(project.progress || 0)
+    color: getStatusColor(project.status)
   }));
   
   useEffect(() => {
@@ -59,10 +46,10 @@ const TestStatus: React.FC<TestStatusProps> = ({ projects = [] }) => {
                   <span className="text-white text-sm">{item.name}</span>
                   <span className="text-dashboard-text-gray text-sm">{item.progress}%</span>
                 </div>
-                <div className="status-bar h-2.5 rounded-full">
+                <div className="status-bar h-2.5 rounded-full bg-gray-700">
                   <div 
                     ref={el => progressRefs.current[index] = el}
-                    className="status-bar-progress h-full rounded-full" 
+                    className="status-bar-progress h-full rounded-full transition-all duration-1000 ease-out" 
                     style={{ 
                       backgroundColor: item.color,
                       width: '0%'

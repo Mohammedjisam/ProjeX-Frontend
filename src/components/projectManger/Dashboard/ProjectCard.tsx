@@ -1,28 +1,23 @@
 import React, { useEffect, useRef } from 'react';
-
-interface ProjectCardProps {
-  title: string;
-  subtitle: string;
-  progress: number;
-  weeksRemaining: number;
-  delay?: number;
-}
+import { getStatusColor } from '../../../services/projectManager/dashboard.services';
+import { ProjectCardProps } from '../../../types/projectManager/Dashboard';
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ 
   title, 
   subtitle, 
   progress, 
   weeksRemaining,
-  delay = 0
+  delay = 0,
+  status = "in-progress"
 }) => {
   const circleRef = useRef<SVGCircleElement>(null);
+  const color = getStatusColor(status);
   
   useEffect(() => {
     const timer = setTimeout(() => {
       if (circleRef.current) {
         const circumference = 251.2; 
         const offset = circumference - (progress / 100) * circumference;
-        circleRef.current.style.setProperty('--progress-value', String(offset));
         circleRef.current.style.strokeDashoffset = String(offset);
       }
     }, 300 + delay);
@@ -31,8 +26,9 @@ const ProjectCard: React.FC<ProjectCardProps> = ({
   }, [progress, delay]);
 
   return (
-    <div className="card-glass p-6 flex flex-col h-[200px] animate-fade-in rounded-xl bg-gray-800" style={{ animationDelay: `${delay}ms` }}>
-      <div className="flex flex-col mb-auto">
+    <div className="card-glass p-6 flex flex-col h-[200px] animate-fade-in rounded-xl bg-gray-800" 
+         style={{ animationDelay: `${delay}ms` }}>
+       <div className="flex flex-col mb-auto">
         <h3 className="text-lg font-medium text-white">{title}</h3>
         <p className="text-dashboard-text-gray text-sm mt-1">{subtitle}</p>
       </div>

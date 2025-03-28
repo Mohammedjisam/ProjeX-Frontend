@@ -1,17 +1,13 @@
 import React, { useEffect, useRef } from 'react';
+import { ProcessedDashboardProject } from  '../../../types/projectManager/Dashboard';
+import { 
+  calculateOverallProgress, 
+  getStatusCounts,
+  getStatusColor 
+} from '../../../services/projectManager/dashboard.services';
 
-interface Project {
-  _id: string;
-  progress: number;
-  status: string;
-}
-
-interface OverallProgressProps {
-  projects: Project[];
-}
-
-const OverallProgress: React.FC<OverallProgressProps> = ({ projects = [] }) => {
-  const progressBarRef = useRef<HTMLDivElement>(null);
+const OverallProgress: React.FC<{ projects: ProcessedDashboardProject[] }> = ({ projects = [] }) => {
+ const progressBarRef = useRef<HTMLDivElement>(null);
   
   // Calculate overall progress from all projects
   const calculateOverallProgress = (): number => {
@@ -82,7 +78,6 @@ const OverallProgress: React.FC<OverallProgressProps> = ({ projects = [] }) => {
         </div>
       </div>
     </div>
-  );
-};
+  );};
 
 export default OverallProgress;

@@ -1,7 +1,7 @@
 // src/pages/companyadmin/profile/Profile.tsx
 import React, { useState } from 'react';
 import Sidebar from '../../components/manager/Sidebar';
-import { useProfile } from '../../hooks/useProfile';
+import { useProfile } from '../../hooks/manager/useProfile';
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card"
 import { Skeleton } from "../../components/ui/skeleton"
 import ProfileForm from '../../components/common/Profile/ProfileForm';
