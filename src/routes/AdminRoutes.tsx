@@ -1,14 +1,14 @@
 import AdminLogin from '../pages/admin/AdminLogin';
-import { AdminDashboard } from '../components/admin/Dashboard';
+import { AdminDashboard } from '../components/admin/Dashboard/Dashboard';
 import ProtectedAdminLogin from '../private/admin/ProtectedAdminLogin';
 import ProtectedAdminRoutes from '../private/admin/ProtectedAdminRoutes';
 import { Routes,Route } from 'react-router-dom';
-import CompanyAdminManagement from '../components/admin/CompanyAdminManagementComponent';
-import ManagerManagement from '../components/admin/ManagerManagement';
-import ProjectManagerManagement from '../components/admin/ProjectManagerManagement';
-import DeveloperManagement from '../components/admin/DeveloperManagement';
-import CompanyTable from '../components/admin/CompanyTable';
-import ViewCompany from '../components/admin/ViewCompany';
+import { DeveloperManagement } from '../pages/admin/DeveloperManagement';
+import { CompanyAdminManagement } from '../pages/admin/CompanyAdminManagement';
+import { ManagerManagement } from '../pages/admin/ManagerManagement';
+import { ProjectManagerManagement } from '../pages/admin/ProjectManagerManagement';
+import { CompanyManagement } from '../pages/admin/CompanyManagement';
+import ViewCompany from '../pages/admin/ViewCompany';
 
 
 function AdminRoutes() {
@@ -22,7 +22,7 @@ function AdminRoutes() {
       <Route path='manager' element={<ProtectedAdminRoutes><ManagerManagement/></ProtectedAdminRoutes>}/>
       <Route path='projectmanager' element={<ProtectedAdminRoutes><ProjectManagerManagement/></ProtectedAdminRoutes>}/>
       <Route path='developer' element={<ProtectedAdminRoutes><DeveloperManagement/></ProtectedAdminRoutes>}/>
-      <Route path='company' element={<ProtectedAdminRoutes><CompanyTable/></ProtectedAdminRoutes>}/>
+      <Route path='company' element={<ProtectedAdminRoutes><CompanyManagement/></ProtectedAdminRoutes>}/>
       <Route path='company/:id' element={<ProtectedAdminRoutes><ViewCompany/></ProtectedAdminRoutes>}/>
 
       </Routes>
