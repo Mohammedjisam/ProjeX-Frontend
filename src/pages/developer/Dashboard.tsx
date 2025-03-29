@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import Sidebar from '../developer/Sidebar';
-import Header from './Header';
-import DashboardContent from './DashboardContent';
+import { useState } from 'react';
+import Sidebar from '../../components/developer/Sidebar';
+import Header from '../../components/developer/Header';
+import { DashboardPage } from '../../components/developer/Dashboard/DashboardPage';
 
-const Dashboard: React.FC = () => {
+export const Dashboard = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   
   const toggleSidebar = () => {
@@ -17,11 +17,9 @@ const Dashboard: React.FC = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header toggleSidebar={toggleSidebar} />
         <main className="flex-1 overflow-hidden">
-          <DashboardContent />
+          <DashboardPage />
         </main>
       </div>
     </div>
   );
 };
-
-export default Dashboard;

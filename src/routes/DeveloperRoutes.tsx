@@ -4,10 +4,9 @@ import { Routes,Route } from 'react-router-dom';
 import ProtectedDeveloperLogin from '../private/developer/ProtectedDeveloperLogin';
 import SetPasswordPage from '../components/developer/SetPasswordPage';
 import ProtectedDeveloperRoutes from '../private/developer/ProtectedDeveloperRoutes';
-import Dashboard from '../components/developer/Dashboard';
-import Profile from '../components/developer/Profile';
-import TaskBoard from '../components/developer/TaskManagement';
-import TaskDetails from '../components/developer/TaskDetails';
+import Profile from '../components/developer/Profile';import { Dashboard } from '../pages/developer/Dashboard';
+import TaskBoard from '../pages/developer/TaskBoard';
+import TaskDetailsPage from '../pages/developer/TaskDetailsPage';
 
 function DeveloperRoutes() {
   return (
@@ -19,7 +18,7 @@ function DeveloperRoutes() {
       <Route path='dashboard' element={<ProtectedDeveloperRoutes><Dashboard/></ProtectedDeveloperRoutes>}/>
       <Route path='profile' element={<ProtectedDeveloperRoutes><Profile/></ProtectedDeveloperRoutes>}/>
       <Route path='tasks' element={<ProtectedDeveloperRoutes><TaskBoard/></ProtectedDeveloperRoutes>}/>
-      <Route path='tasks/:taskId' element={<ProtectedDeveloperRoutes><TaskDetails/></ProtectedDeveloperRoutes>}/>
+      <Route path='tasks/:taskId' element={<ProtectedDeveloperRoutes><TaskDetailsPage/></ProtectedDeveloperRoutes>}/>
 
       </Routes>
     </div>
