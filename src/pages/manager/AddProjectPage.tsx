@@ -23,13 +23,21 @@ const AddProjectPage = () => {
     comments: "",
   });
 
+  console.log("projectManagers", projectManagers);
+
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setProjectData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSelectChange = (name: string, value: string) => {
-    setProjectData(prev => ({ ...prev, [name]: value }));
+    setProjectData(prev => {
+      const updated = { ...prev, [name]: value };
+      console.log("Updated field:", name, "Value:", value);
+      console.log("Updated project data:", updated);
+      return updated;
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {

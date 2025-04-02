@@ -45,12 +45,12 @@ const Dashboard: React.FC = () => {
         ) : (
           managers.map((manager, index) => (
             <ManagerCard 
-              key={manager._id} 
+              key={manager._id || index}
               manager={{
-                id: parseInt(manager._id.slice(-4), 16) || index + 1,
-                name: manager.name,
+                id: manager._id ? parseInt(manager._id.slice(-4), 16) || index + 1 : index + 1,
+                name: manager.name || "Unnamed",
                 avatar: '/placeholder.svg?height=60&width=60',
-                projectCount: getProjectCountForManager(manager._id),
+                projectCount: getProjectCountForManager(manager._id || ""),
                 phone: manager.phoneNumber || "Not provided",
                 isHighlighted: index === 0 
               }} 

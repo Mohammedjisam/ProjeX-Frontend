@@ -35,7 +35,7 @@ export interface ProjectFormData {
 }
 
 export interface ProjectManager {
-  _id: string;
+  id: string;
   name: string;
   email: string;
   role?: string;

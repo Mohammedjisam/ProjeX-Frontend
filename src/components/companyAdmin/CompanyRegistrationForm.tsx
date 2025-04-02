@@ -195,7 +195,7 @@ const CompanyRegistrationForm = () => {
                     >
                       <div className="font-medium capitalize">{plan}</div>
                       <div className="text-sm">
-                        ${plan === 'basic' ? 15 : plan === 'pro' ? 20 : 30}/month
+                      ₹{plan === 'basic' ? 1500 : plan === 'pro' ? 2000 : 3000}/month
                       </div>
                     </div>
                   ))}

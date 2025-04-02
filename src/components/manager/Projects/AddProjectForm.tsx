@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProjectFormData, ProjectManager } from '../../../types/Manager/Project'
+import { ProjectFormData, ProjectManager } from '../../../types/Manager/Project';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
 import { Label } from '../../ui/label';
@@ -34,7 +34,6 @@ export const AddProjectForm = ({
       <CardContent className="p-6">
         <form onSubmit={onSubmit} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Project Name */}
             <div className="space-y-2">
               <Label htmlFor="name">Project Name*</Label>
               <Input
@@ -47,7 +46,6 @@ export const AddProjectForm = ({
               />
             </div>
 
-            {/* Goal */}
             <div className="space-y-2">
               <Label htmlFor="goal">Goal*</Label>
               <Input
@@ -60,7 +58,6 @@ export const AddProjectForm = ({
               />
             </div>
 
-            {/* Description */}
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="description">Description*</Label>
               <Textarea
@@ -74,7 +71,6 @@ export const AddProjectForm = ({
               />
             </div>
 
-            {/* Client Name */}
             <div className="space-y-2">
               <Label htmlFor="clientName">Client Name*</Label>
               <Input
@@ -87,7 +83,6 @@ export const AddProjectForm = ({
               />
             </div>
 
-            {/* Budget */}
             <div className="space-y-2">
               <Label htmlFor="budget">Budget*</Label>
               <Input
@@ -102,7 +97,6 @@ export const AddProjectForm = ({
               />
             </div>
 
-            {/* Start Date */}
             <div className="space-y-2">
               <Label htmlFor="startDate">Start Date*</Label>
               <Input
@@ -115,7 +109,6 @@ export const AddProjectForm = ({
               />
             </div>
 
-            {/* End Date */}
             <div className="space-y-2">
               <Label htmlFor="endDate">End Date*</Label>
               <Input
@@ -128,28 +121,28 @@ export const AddProjectForm = ({
               />
             </div>
 
-            {/* Project Manager */}
+            {/* ✅ FIXED Project Manager Dropdown */}
             <div className="space-y-2">
               <Label htmlFor="projectManager">Project Manager*</Label>
               <Select
                 value={projectData.projectManager}
-                onValueChange={(value) => onSelectChange("projectManager", value)}
-                required
+                onValueChange={(value) => onSelectChange('projectManager', value)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a Manager" />
                 </SelectTrigger>
                 <SelectContent>
-                  {projectManagers.map((manager) => (
-                    <SelectItem key={manager._id} value={manager._id}>
-                      {manager.name}
-                    </SelectItem>
-                  ))}
+                  {projectManagers
+                    ?.filter(manager => manager && manager.id && manager.name)
+                    .map(manager => (
+                      <SelectItem key={manager.id} value={manager.id}>
+                        {manager.name}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
             </div>
 
-            {/* Status */}
             <div className="space-y-2">
               <Label htmlFor="status">Status</Label>
               <Select
@@ -168,7 +161,6 @@ export const AddProjectForm = ({
               </Select>
             </div>
 
-            {/* Comments */}
             <div className="space-y-2 md:col-span-2">
               <Label htmlFor="comments">Comments</Label>
               <Textarea
@@ -183,17 +175,10 @@ export const AddProjectForm = ({
           </div>
 
           <div className="flex justify-end gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={onCancel}
-            >
+            <Button type="button" variant="outline" onClick={onCancel}>
               Cancel
             </Button>
-            <Button
-              type="submit"
-              disabled={isLoading}
-            >
+            <Button type="submit" disabled={isLoading}>
               {isLoading ? "Creating..." : "Create Project"}
             </Button>
           </div>

@@ -8,6 +8,8 @@ import SubmitButton from '../../components/common/Password/SubmitButton';
 
 const SetPasswordPage = () => {
   const { token } = useParams<{ token: string }>();
+  console.log('Token:', token);
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -48,7 +50,13 @@ const SetPasswordPage = () => {
     );
   }
 
-  if (!isTokenValid) return null;
+  if (!validateToken.isLoading && !isTokenValid) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-gray-900 text-red-500">
+        Invalid or expired password reset link.
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 px-4">

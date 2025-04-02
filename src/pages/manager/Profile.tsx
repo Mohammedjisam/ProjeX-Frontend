@@ -47,7 +47,7 @@ const Profile: React.FC = () => {
       return (
         <div className="flex min-h-screen">
           <Sidebar />
-          <div className="flex-1 ml-[240px] p-6">
+          <div className="flex-1  p-6">
           <div className="max-w-3xl mx-auto mt-8">
             <Card className="border-slate-700 bg-slate-800/50 backdrop-blur-sm shadow-xl">
               <CardHeader className="border-b border-slate-700 pb-4">

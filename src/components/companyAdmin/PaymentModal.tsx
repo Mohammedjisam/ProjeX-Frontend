@@ -115,7 +115,7 @@ const CheckoutForm = ({
             {companyData.companyName} - {companyData.planId.charAt(0).toUpperCase() + companyData.planId.slice(1)} Plan
           </h3>
           <p className="text-xl font-bold">
-            ${companyData.planId === 'basic' ? '15' : companyData.planId === 'pro' ? '20' : '30'}
+          ₹{companyData.planId === 'basic' ? '1500' : companyData.planId === 'pro' ? '2000' : '3000'}
             <span className="text-sm font-normal text-gray-400">/month</span>
           </p>
         </div>
@@ -152,7 +152,7 @@ const CheckoutForm = ({
             className="w-full"
             loading={isPending}
           >
-            {`Pay $${companyData.planId === 'basic' ? '15' : companyData.planId === 'pro' ? '20' : '30'}`}
+            {`Pay ₹${companyData.planId === 'basic' ? '1500' : companyData.planId === 'pro' ? '2000' : '3000'}`}
           </Button>
         </form>
       </div>
